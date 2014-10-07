@@ -56,22 +56,22 @@ module SamlIdp
 
   describe "Algorithms" do
     it "validate using SHA1" do
-      document = XMLSecurity::SignedDocument.new(fixture(:adfs_response_sha1, false))
+      document = XMLSecurity::SignedDocument.new(fixture_response(:adfs_response_sha1, false))
       document.validate("F1:3C:6B:80:90:5A:03:0E:6C:91:3E:5D:15:FA:DD:B0:16:45:48:72").should be_truthy
     end
 
     it "validate using SHA256" do
-      document = XMLSecurity::SignedDocument.new(fixture(:adfs_response_sha256, false))
+      document = XMLSecurity::SignedDocument.new(fixture_response(:adfs_response_sha256, false))
       document.validate("28:74:9B:E8:1F:E8:10:9C:A8:7C:A9:C3:E3:C5:01:6C:92:1C:B4:BA").should be_truthy
     end
 
     it "validate using SHA384" do
-      document = XMLSecurity::SignedDocument.new(fixture(:adfs_response_sha384, false))
+      document = XMLSecurity::SignedDocument.new(fixture_response(:adfs_response_sha384, false))
       document.validate("F1:3C:6B:80:90:5A:03:0E:6C:91:3E:5D:15:FA:DD:B0:16:45:48:72").should be_truthy
     end
 
     it "validate using SHA512" do
-      document = XMLSecurity::SignedDocument.new(fixture(:adfs_response_sha512, false))
+      document = XMLSecurity::SignedDocument.new(fixture_response(:adfs_response_sha512, false))
       document.validate("F1:3C:6B:80:90:5A:03:0E:6C:91:3E:5D:15:FA:DD:B0:16:45:48:72").should be_truthy
     end
   end
@@ -79,7 +79,7 @@ module SamlIdp
   describe "XmlSecurity::SignedDocument" do
     describe "#extract_inclusive_namespaces" do
       it "support explicit namespace resolution for exclusive canonicalization" do
-        response = fixture(:open_saml_response, false)
+        response = fixture_response(:open_saml_response, false)
         document = XMLSecurity::SignedDocument.new(response)
         inclusive_namespaces = document.send(:extract_inclusive_namespaces)
 
@@ -87,7 +87,7 @@ module SamlIdp
       end
 
       it "support implicit namespace resolution for exclusive canonicalization" do
-        response = fixture(:no_signature_ns, false)
+        response = fixture_response(:no_signature_ns, false)
         document = XMLSecurity::SignedDocument.new(response)
         inclusive_namespaces = document.send(:extract_inclusive_namespaces)
 
@@ -95,7 +95,7 @@ module SamlIdp
       end
 
       it "return an empty list when inclusive namespace element is missing" do
-        response = fixture(:no_signature_ns, false)
+        response = fixture_response(:no_signature_ns, false)
         response.slice! %r{<InclusiveNamespaces xmlns="http://www.w3.org/2001/10/xml-exc-c14n#" PrefixList="#default saml ds xs xsi"/>}
 
         document = XMLSecurity::SignedDocument.new(response)
@@ -106,7 +106,7 @@ module SamlIdp
     end
 
     describe "StarfieldTMS" do
-      let(:response) { ::OneLogin::RubySaml::Response.new(fixture(:starfield_response)) }
+      let(:response) { ::OneLogin::RubySaml::Response.new(fixture_response(:starfield_response)) }
 
       before do
         response.settings = ::OneLogin::RubySaml::Settings.new(

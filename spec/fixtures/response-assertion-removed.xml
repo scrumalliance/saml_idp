@@ -1,0 +1,6 @@
+<?xml version="1.0"?>
+<samlp:Response xmlns:samlp="urn:oasis:names:tc:SAML:2.0:protocol" ID="_response_id" Version="2.0" IssueInstant="2010-06-01T13:00:00Z" Destination="http://sportngin.com" Consent="urn:oasis:names:tc:SAML:2.0:consent:unspecified" InResponseTo="_134">
+  <samlp:Status>
+    <samlp:StatusCode Value="urn:oasis:names:tc:SAML:2.0:status:Success"/>
+  </samlp:Status>
+</samlp:Response>

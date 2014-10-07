@@ -1,9 +1,10 @@
-# encoding: utf-8
 require 'openssl'
 require 'base64'
 require 'time'
 require 'uuid'
 require 'saml_idp/request'
+require 'pry'
+
 module SamlIdp
   module Controller
     extend ActiveSupport::Concern
@@ -35,7 +36,7 @@ module SamlIdp
       audience_uri = opts[:audience_uri] || saml_request.issuer || saml_acs_url[/^(.*?\/\/.*?\/)/, 1]
       opt_issuer_uri = opts[:issuer_uri] || issuer_uri
 
-      SamlResponse.new(
+      response_doc = SamlResponse.new(
         reference_id,
         response_id,
         opt_issuer_uri,
@@ -44,8 +45,11 @@ module SamlIdp
         saml_request_id,
         saml_acs_url,
         algorithm,
-        authn_context_classref
+        authn_context_classref,
+        SamlIdpConfig.finder(saml_request.issuer)[:cert],
       ).build
+
+      Base64.encode64(response_doc.to_xml)
     end
 
     def issuer_uri

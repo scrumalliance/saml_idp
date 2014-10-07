@@ -70,6 +70,7 @@ module SamlIdp
 
     def authn_request
       xpath("//samlp:AuthnRequest", samlp: samlp).first
+      # TODO(awong): Assert the existance of only 1 AuthnRequest.
     end
     private :authn_request
 

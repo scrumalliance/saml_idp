@@ -1,5 +1,5 @@
 module SecurityHelpers
-  def fixture(document, base64 = true)
+  def fixture_response(document, base64 = true)
     response = Dir.glob(File.join(File.dirname(__FILE__), "responses", "#{document}*")).first
     if base64 && response =~ /\.xml$/
       Base64.encode64(File.read(response))

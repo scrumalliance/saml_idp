@@ -1,0 +1,66 @@
+<?xml version="1.0"?>
+<Assertion xmlns="urn:oasis:names:tc:SAML:2.0:assertion" ID="_abc" IssueInstant="2010-06-01T13:00:00Z" Version="2.0">
+  <Issuer>http://sportngin.com</Issuer>
+  <Signature xmlns="http://www.w3.org/2000/09/xmldsig#">
+    <SignedInfo>
+      <CanonicalizationMethod Algorithm="http://www.w3.org/2001/10/xml-exc-c14n#"/>
+      <SignatureMethod Algorithm="http://www.w3.org/2000/09/xmldsig#rsa-sha1"/>
+      <Reference URI="#_abc">
+        <Transforms>
+          <Transform Algorithm="http://www.w3.org/2000/09/xmldsig#enveloped-signature"/>
+          <Transform Algorithm="http://www.w3.org/2001/10/xml-exc-c14n#"/>
+        </Transforms>
+        <DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha1"/>
+        <DigestValue>CMG8Q0nql3MsOiXCpFPAUudMe9c=</DigestValue>
+      </Reference>
+    </SignedInfo>
+    <SignatureValue>VgRQDwAhRa8SXGvkd2xTWGOx9HoTfW3GaRtkLERL/Sg3bCVHVqvH1ZiZguNPJozY
+hmc/Gy7ztK0tLZhEBa3KpOMZwzdf8hMh7CWvK39zgTs2C+8DggAsa+caz164vgJP
+hiAB9htiVzcdLtWgRBzVEaCRil+TRE6QgUlagAYZnGk=</SignatureValue>
+    <KeyInfo>
+      <X509Data>
+        <X509Certificate>MIIDqzCCAxSgAwIBAgIBATANBgkqhkiG9w0BAQsFADCBhjELMAkGA1UEBhMCQVUx
+DDAKBgNVBAgTA05TVzEPMA0GA1UEBxMGU3lkbmV5MQwwCgYDVQQKDANQSVQxCTAH
+BgNVBAsMADEYMBYGA1UEAwwPbGF3cmVuY2VwaXQuY29tMSUwIwYJKoZIhvcNAQkB
+DBZsYXdyZW5jZS5waXRAZ21haWwuY29tMB4XDTEyMDQyODAyMjIyOFoXDTMyMDQy
+MzAyMjIyOFowgYYxCzAJBgNVBAYTAkFVMQwwCgYDVQQIEwNOU1cxDzANBgNVBAcT
+BlN5ZG5leTEMMAoGA1UECgwDUElUMQkwBwYDVQQLDAAxGDAWBgNVBAMMD2xhd3Jl
+bmNlcGl0LmNvbTElMCMGCSqGSIb3DQEJAQwWbGF3cmVuY2UucGl0QGdtYWlsLmNv
+bTCBnzANBgkqhkiG9w0BAQEFAAOBjQAwgYkCgYEAuBywPNlC1FopGLYfF96SotiK
+8Nj6/nW084O4omRMifzy7x955RLEy673q2aiJNB3LvE6Xvkt9cGtxtNoOXw1g2Uv
+HKpldQbr6bOEjLNeDNW7j0ob+JrRvAUOK9CRgdyw5MC6lwqVQQ5C1DnaT/2fSBFj
+asBFTR24dEpfTy8HfKECAwEAAaOCASUwggEhMAkGA1UdEwQCMAAwCwYDVR0PBAQD
+AgUgMB0GA1UdDgQWBBQNBGmmt3ytKpcJaBaYNbnyU2xkazATBgNVHSUEDDAKBggr
+BgEFBQcDATAdBglghkgBhvhCAQ0EEBYOVGVzdCBYNTA5IGNlcnQwgbMGA1UdIwSB
+qzCBqIAUDQRpprd8rSqXCWgWmDW58lNsZGuhgYykgYkwgYYxCzAJBgNVBAYTAkFV
+MQwwCgYDVQQIEwNOU1cxDzANBgNVBAcTBlN5ZG5leTEMMAoGA1UECgwDUElUMQkw
+BwYDVQQLDAAxGDAWBgNVBAMMD2xhd3JlbmNlcGl0LmNvbTElMCMGCSqGSIb3DQEJ
+AQwWbGF3cmVuY2UucGl0QGdtYWlsLmNvbYIBATANBgkqhkiG9w0BAQsFAAOBgQAE
+cVUPBX7uZmzqZJfy+tUPOT5ImNQj8VE2lerhnFjnGPHmHIqhpzgnwHQujJfs/a30
+9Wm5qwcCaC1eO5cWjcG0x3OjdllsgYDatl5GAumtBx8J3NhWRqNUgitCIkQlxHIw
+UfgQaCushYgDDL5YbIQa++egCgpIZ+T0Dj5oRew//A==</X509Certificate>
+      </X509Data>
+    </KeyInfo>
+  </Signature>
+  <Subject>
+    <NameID Format="urn:oasis:names:tc:SAML:1.1:nameid-format:emailAddress">foo@example.com</NameID>
+    <SubjectConfirmation Method="urn:oasis:names:tc:SAML:2.0:cm:bearer">
+      <SubjectConfirmationData InResponseTo="123" NotOnOrAfter="2010-06-01T13:03:00Z" Recipient="http://saml.acs.url"/>
+    </SubjectConfirmation>
+  </Subject>
+  <Conditions NotBefore="2010-06-01T12:59:55Z" NotOnOrAfter="2010-06-01T14:00:00Z">
+    <AudienceRestriction>
+      <Audience>http://example.com</Audience>
+    </AudienceRestriction>
+  </Conditions>
+  <AttributeStatement>
+    <Attribute Name="email-address" NameFormat="urn:oasis:names:tc:SAML:2.0:attrname-format:uri" FriendlyName="emailAddress">
+      <AttributeValue>foo@example.com</AttributeValue>
+    </Attribute>
+  </AttributeStatement>
+  <AuthnStatement AuthnInstant="2010-06-01T13:00:00Z" SessionIndex="_abc">
+    <AuthnContext>
+      <AuthnContextClassRef>urn:oasis:names:tc:SAML:2.0:ac:classes:Password</AuthnContextClassRef>
+    </AuthnContext>
+  </AuthnStatement>
+</Assertion>

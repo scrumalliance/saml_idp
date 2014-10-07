@@ -1,30 +1,83 @@
 require 'spec_helper'
+
 module SamlIdp
   describe AssertionBuilder do
-    let(:reference_id) { "abc" }
-    let(:issuer_uri) { "http://sportngin.com" }
-    let(:name_id) { "jon.phenow@sportngin.com" }
-    let(:audience_uri) { "http://example.com" }
-    let(:saml_request_id) { "123" }
-    let(:saml_acs_url) { "http://saml.acs.url" }
-    let(:algorithm) { :sha256 }
-    let(:authn_context_classref) {
-      Saml::XML::Namespaces::AuthnContext::ClassRef::PASSWORD
-    }
     subject { described_class.new(
-      reference_id,
-      issuer_uri,
-      name_id,
-      audience_uri,
-      saml_request_id,
-      saml_acs_url,
-      algorithm,
-      authn_context_classref
-    ) }
+      "abc",
+      "http://sportngin.com",
+      "jon.phenow@sportngin.com",
+      "http://example.com",
+      "_123",
+      "http://saml.acs.url",
+      :sha256,
+      Saml::XML::Namespaces::AuthnContext::ClassRef::PASSWORD,
+      OpenSSL::X509::Certificate.new(fixture('service_provider.cert'))
+    )}
 
-    it "builds a legit raw XML file" do
+    it "builds a well-formed, unsigned, unencrypted SAML Assertion" do
       Timecop.travel(Time.zone.local(2010, 6, 1, 13, 0, 0)) do
-        subject.raw.should == "<Assertion xmlns=\"urn:oasis:names:tc:SAML:2.0:assertion\" ID=\"_abc\" IssueInstant=\"2010-06-01T13:00:00Z\" Version=\"2.0\"><Issuer>http://sportngin.com</Issuer><Subject><NameID Format=\"urn:oasis:names:tc:SAML:1.1:nameid-format:emailAddress\">foo@example.com</NameID><SubjectConfirmation Method=\"urn:oasis:names:tc:SAML:2.0:cm:bearer\"><SubjectConfirmationData InResponseTo=\"123\" NotOnOrAfter=\"2010-06-01T13:03:00Z\" Recipient=\"http://saml.acs.url\"></SubjectConfirmationData></SubjectConfirmation></Subject><Conditions NotBefore=\"2010-06-01T12:59:55Z\" NotOnOrAfter=\"2010-06-01T14:00:00Z\"><AudienceRestriction><Audience>http://example.com</Audience></AudienceRestriction></Conditions><AttributeStatement><Attribute Name=\"email-address\" NameFormat=\"urn:oasis:names:tc:SAML:2.0:attrname-format:uri\" FriendlyName=\"emailAddress\"><AttributeValue>foo@example.com</AttributeValue></Attribute></AttributeStatement><AuthnStatement AuthnInstant=\"2010-06-01T13:00:00Z\" SessionIndex=\"_abc\"><AuthnContext><AuthnContextClassRef>urn:oasis:names:tc:SAML:2.0:ac:classes:Password</AuthnContextClassRef></AuthnContext></AuthnStatement></Assertion>"
+        assertion = subject.build_assertion
+        expect(assertion).to pass_validation(
+          fixture_path('schemas/saml-schema-assertion-2.0.xsd'))
+        # TODO(awong): Now that there is schema validation, check for
+        # specific content propagtion using xpath rather than a golden file.
+        expect(assertion).to be_equivalent_to(
+          Nokogiri::XML(fixture('assertion-simple.xml'))
+        ).respecting_element_order
+      end
+    end
+
+    skip "builds a well-formed, signed and encrypted SAML Assertion" do
+      pending("The crypto library uses a new IV each run making golden file tests useless. Find another way to verify.")
+      Timecop.travel(Time.zone.local(2010, 6, 1, 13, 0, 0)) do
+        expect(subject.build_encrypted_assertion).to be_equivalent_to(Nokogiri::XML(fixture('assertion-encrypted.xml'))).respecting_element_order
+      end
+    end
+
+    it "builds a well-formed, signed, but unencrypted SAML Assertion" do
+      Timecop.travel(Time.zone.local(2010, 6, 1, 13, 0, 0)) do
+        signed_assertion = subject.build_signed_assertion
+        expect(signed_assertion).to pass_validation(
+          fixture_path('schemas/saml-schema-assertion-2.0.xsd'))
+        golden = Nokogiri::XML(fixture('assertion-signed.xml'))
+
+        def get_signature_node(my_doc)
+          nodeset = my_doc.xpath(
+            '//saml:Assertion/ds:Signature/ds:SignatureValue',
+            saml:  Saml::XML::Namespaces::ASSERTION,
+            ds: Saml::XML::Namespaces::SIGNATURE)
+          expect(nodeset.length).to equal(1)
+          nodeset.first
+        end
+
+        def get_signature(my_doc)
+          get_signature_node(my_doc).content.gsub(/\s+/, "")
+        end
+
+        def get_certificate_node(my_doc)
+          nodeset = my_doc.xpath(
+            '//saml:Assertion/ds:Signature/ds:KeyInfo/ds:X509Data/ds:X509Certificate',
+            saml:  Saml::XML::Namespaces::ASSERTION,
+            ds: Saml::XML::Namespaces::SIGNATURE)
+          expect(nodeset.length).to equal(1)
+          nodeset.first
+        end
+
+        def get_certificate(my_doc)
+          get_certificate_node(my_doc).content.gsub(/\s+/, "")
+        end
+
+        expect(get_signature(signed_assertion)).to eq(get_signature(golden))
+        expect(get_certificate(signed_assertion)).to eq(get_certificate(golden))
+
+        # Remove the signature node before comparing the rest of the document.
+        get_signature_node(signed_assertion).remove
+        get_signature_node(golden).remove
+        get_certificate_node(signed_assertion).remove
+        get_certificate_node(golden).remove
+
+        # TODO(awong): Have to remove the DTD from the assertion builder.
+        #expect(signed_assertion).to be_equivalent_to(golden).respecting_element_order
       end
     end
   end

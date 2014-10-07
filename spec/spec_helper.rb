@@ -14,6 +14,9 @@ require 'rspec'
 require 'capybara/rspec'
 require 'capybara/rails'
 
+require 'rspec/matchers'
+require 'equivalent-xml'
+require 'equivalent-xml/rspec_matchers'
 require 'ruby-saml'
 require 'saml_idp'
 require 'timecop'
@@ -24,6 +27,7 @@ RSpec.configure do |config|
   config.mock_with :rspec
   config.order = "random"
 
+  config.include Rspec::Xsd
   config.include SamlRequestMacros
   config.include SecurityHelpers
 
@@ -43,7 +47,14 @@ RSpec.configure do |config|
       }
     end
   end
+
+  def fixture_path(filename)
+    File.join(File.expand_path('fixtures', File.dirname(__FILE__)), filename)
+  end
+
+  def fixture(path)
+    File.read fixture_path(path)
+  end
 end
 
 Capybara.default_host = "https://app.example.com"
-
