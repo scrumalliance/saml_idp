@@ -45,7 +45,7 @@ module SamlIdp
         saml_acs_url,
         algorithm,
         authn_context_classref,
-        SamlIdpConfig.finder(saml_request.issuer)[:cert],
+        SamlIdp.config.service_provider.finder.(saml_request.issuer)[:cert],
       ).build
 
       Base64.encode64(response_doc.to_xml)

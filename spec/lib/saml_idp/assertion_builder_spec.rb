@@ -11,7 +11,7 @@ module SamlIdp
       "http://saml.acs.url",
       :sha256,
       Saml::XML::Namespaces::AuthnContext::ClassRef::PASSWORD,
-      OpenSSL::X509::Certificate.new(fixture('service_provider.cert'))
+      Default::SERVICE_PROVIDER_CERT,
     )}
 
     it "builds a well-formed, unsigned, unencrypted SAML Assertion" do

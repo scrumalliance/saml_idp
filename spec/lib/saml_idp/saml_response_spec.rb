@@ -26,7 +26,7 @@ module SamlIdp
                                   "http://localhost/acs",
                                   :sha256,
                                   Saml::XML::Namespaces::AuthnContext::ClassRef::PASSWORD,
-                                  fixture('service_provider.cert'))
+                                  Default::SERVICE_PROVIDER_CERT)
       # Don't throw.
       response.build
     end
