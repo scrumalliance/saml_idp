@@ -1,5 +1,7 @@
 .DS_Store
 .Gemfile
+.ruby-gemset
+.ruby-version
 /.bundle
 /.rvmrc
 /coverage
