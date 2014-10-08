@@ -3,7 +3,6 @@ require 'base64'
 require 'time'
 require 'uuid'
 require 'saml_idp/request'
-require 'pry'
 
 module SamlIdp
   module Controller
