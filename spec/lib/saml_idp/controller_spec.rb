@@ -4,6 +4,9 @@ require 'spec_helper'
 describe SamlIdp::Controller do
   include SamlIdp::Controller
 
+  XMLDSIG_SHA256_URI = 'http://www.w3.org/2001/04/xmldsig-more#rsa-sha256'
+  XMLENC_SHA256_URI = 'http://www.w3.org/2001/04/xmlenc#sha256'
+
   def render(*)
   end
 
@@ -41,6 +44,22 @@ describe SamlIdp::Controller do
       response.issuer.should == "http://example.com"
       response.settings = saml_settings
       response.is_valid?.should be_truthy
+      nokogiri_doc = Nokogiri::XML(response.document.to_s)
+      signature_method_nodeset = nokogiri_doc.xpath(
+        '//samlp:Response/saml:Assertion/ds:Signature/ds:SignedInfo/ds:SignatureMethod',
+        samlp: Saml::XML::Namespaces::PROTOCOL,
+        saml: Saml::XML::Namespaces::ASSERTION,
+        ds: Saml::XML::Namespaces::SIGNATURE)
+      expect(signature_method_nodeset.length).to be(1)
+      expect(signature_method_nodeset[0].attribute('Algorithm').value).to eql(XMLDSIG_SHA256_URI)
+
+      digest_method_nodeset = nokogiri_doc.xpath(
+        '//samlp:Response/saml:Assertion/ds:Signature/ds:SignedInfo/ds:Reference/ds:DigestMethod',
+        samlp: Saml::XML::Namespaces::PROTOCOL,
+        saml: Saml::XML::Namespaces::ASSERTION,
+        ds: Saml::XML::Namespaces::SIGNATURE)
+      expect(digest_method_nodeset.length).to be(1)
+      expect(digest_method_nodeset[0].attribute('Algorithm').value).to eql(XMLENC_SHA256_URI)
     end
 
     [:sha1, :sha256, :sha384, :sha512].each do |algorithm_name|
