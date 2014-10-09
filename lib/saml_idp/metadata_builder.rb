@@ -23,7 +23,6 @@ module SamlIdp
           # document. Oops.
 #            "xmlns:ds" => Saml::XML::Namespaces::SIGNATURE,
           entityID: entity_id do
-#            sign entity
 
             xml.IDPSSODescriptor protocolSupportEnumeration: protocol_enumeration do
               build_key_descriptor xml
@@ -145,7 +144,7 @@ module SamlIdp
       .to_s
       .gsub(/-----BEGIN CERTIFICATE-----/,"")
       .gsub(/-----END CERTIFICATE-----/,"")
-      .gsub(/\n/, "")
+      .gsub(/\n/, " ")
     end
 
     %w[
