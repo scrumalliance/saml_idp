@@ -35,10 +35,10 @@ module SamlIdp
 
     def response_builder
       if @sp_cert.nil?
-        ResponseBuilder.new(@response_id, @saml_acs_url, @saml_request_id,
+        ResponseBuilder.new(@response_id, @issuer_uri, @saml_acs_url, @saml_request_id,
                             assertion_builder.build_signed_assertion)
       else
-        ResponseBuilder.new(@response_id, @saml_acs_url, @saml_request_id,
+        ResponseBuilder.new(@response_id, @issuer_uri, @saml_acs_url, @saml_request_id,
                             assertion_builder.build_encrypted_assertion)
       end
     end

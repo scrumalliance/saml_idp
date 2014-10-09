@@ -6,8 +6,9 @@ module SamlIdp
     # Builds a SAML 2.0 response element per #3.3.3. 
     #
     # The response is always assumed to be successful.
-    def initialize(response_id, saml_acs_url, saml_request_id, assertion)
+    def initialize(response_id, issuer_uri, saml_acs_url, saml_request_id, assertion)
       @response_id = response_id
+      @issuer_uri = issuer_uri
       @saml_acs_url = saml_acs_url
       @saml_request_id = saml_request_id
       @assertion = assertion
@@ -22,6 +23,7 @@ module SamlIdp
                      Destination: @saml_acs_url,
                      Consent: Saml::XML::Namespaces::Consents::UNSPECIFIED,
                      InResponseTo: @saml_request_id) do
+          xml.Issuer @issuer_uri, xmlns: Saml::XML::Namespaces::ASSERTION
           xml.Status do
             xml.StatusCode Value: Saml::XML::Namespaces::Statuses::SUCCESS 
           end
