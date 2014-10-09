@@ -41,6 +41,7 @@ module SamlIdp
     end
 
     def valid?
+      # TODO(awong): This should validate against the schema.
       service_provider? &&
         valid_signature? &&
         acs_url.present?
@@ -66,13 +67,11 @@ module SamlIdp
     def document
       @document ||= Saml::XML::Document.parse(raw_xml)
     end
-    private :document
 
     def authn_request
       xpath("//samlp:AuthnRequest", samlp: samlp).first
       # TODO(awong): Assert the existance of only 1 AuthnRequest.
     end
-    private :authn_request
 
     def samlp
       Saml::XML::Namespaces::PROTOCOL

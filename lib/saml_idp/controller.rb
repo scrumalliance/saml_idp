@@ -26,14 +26,16 @@ module SamlIdp
       self.saml_request = Request.from_deflated_request(raw_saml_request)
     end
 
-    def authn_context_classref
-      Saml::XML::Namespaces::AuthnContext::ClassRef::PASSWORD
-    end
-
     def encode_response(principal, opts = {})
       response_id, reference_id = get_saml_response_id, get_saml_reference_id
       audience_uri = opts[:audience_uri] || saml_request.issuer || saml_acs_url[/^(.*?\/\/.*?\/)/, 1]
       opt_issuer_uri = opts[:issuer_uri] || issuer_uri
+      authn_context_classref = opts[:authn_context_classref] || Saml::XML::Namespaces::AuthnContext::ClassRef::PASSWORD
+      service_provider = SamlIdp.config.service_provider.finder.(saml_request.issuer)
+      service_provider_cert = service_provider[:cert]
+      if service_provider[:encrypted_assertions] && service_provider_cert.nil?
+        raise "Must have cert"
+      end
 
       response_doc = SamlResponse.new(
         reference_id,
@@ -45,7 +47,7 @@ module SamlIdp
         saml_acs_url,
         algorithm,
         authn_context_classref,
-        SamlIdp.config.service_provider.finder.(saml_request.issuer)[:cert],
+        service_provider_cert
       ).build
 
       Base64.encode64(response_doc.to_xml)

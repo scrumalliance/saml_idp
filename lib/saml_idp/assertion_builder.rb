@@ -18,7 +18,7 @@ module SamlIdp
       @sp_cert = sp_cert
     end
 
-    # Build a samlp:Assertion per section #2.3.3.
+    # Build a saml:Assertion per section #2.3.3.
     #
     # Required attributes:
     #   ID: xs:ID string following #1.3.4 uniqueness requirements.
