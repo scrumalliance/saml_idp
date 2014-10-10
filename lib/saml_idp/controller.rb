@@ -39,11 +39,11 @@ module SamlIdp
           digest = OpenSSL::Digest::SHA512.new
         end
         service_provider_cert = OpenSSL::X509::Certificate.new(service_provider[:cert])
-        if !service_provider_cert.public_key.verify(digest, Base64.urlsafe_decode64(signature), plain_string)
-          logger.error("Bad signature on get request")
-          render nothing: true, status: :forbidden
-          return
-        end
+#        if !service_provider_cert.public_key.verify(digest, Base64.urlsafe_decode64(signature), plain_string)
+#          logger.error("Bad signature on get request")
+#          render nothing: true, status: :forbidden
+#          return
+#        end
       end
       render nothing: true, status: :forbidden unless valid_saml_request?
     end
