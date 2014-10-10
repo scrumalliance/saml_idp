@@ -7,6 +7,7 @@ module SamlIdp
       Timecop.travel(Time.zone.local(2010, 6, 1, 13, 0, 0)) do
         response_builder = ResponseBuilder.new(
           "response_id",
+          "http://example.com",
           "http://sportngin.com",
           "_134",
           Nokogiri::XML(fixture('assertion-simple.xml')))
@@ -31,6 +32,7 @@ module SamlIdp
       Timecop.travel(Time.zone.local(2010, 6, 1, 13, 0, 0)) do
         response_builder = ResponseBuilder.new(
           "response_id",
+          "http://example.com",
           "http://sportngin.com",
           "_134",
           Nokogiri::XML(fixture('assertion-encrypted.xml')))

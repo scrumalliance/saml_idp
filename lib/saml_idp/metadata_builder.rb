@@ -60,7 +60,6 @@ module SamlIdp
                             'ds' => Saml::XML::Namespaces::SIGNATURE)[0]
       namespaces = signature.namespaces
       doc.root.first_element_child.add_previous_sibling(signature)
-
       doc
     end
 
@@ -144,7 +143,6 @@ module SamlIdp
       .to_s
       .gsub(/-----BEGIN CERTIFICATE-----/,"")
       .gsub(/-----END CERTIFICATE-----/,"")
-      .gsub(/\n/, " ")
     end
 
     %w[
