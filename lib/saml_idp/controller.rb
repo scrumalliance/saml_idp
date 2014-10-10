@@ -25,7 +25,11 @@ module SamlIdp
         raise "Missing part of signature" unless !signature.nil? && !algorithm.nil?
         # TODO(awong): Get the raw parameters here. This is silly to reconstruct and
         # somewhat unsafe.
-        plain_string = "SAMLRequest=#{URI.encode_www_form_component(raw_saml_request)}&SigAlg=#{URI.encode_www_form_component(algorithm)}"
+        if relay_state.nil?
+          plain_string = "SAMLRequest=#{URI.encode_www_form_component(raw_saml_request)}&SigAlg=#{URI.encode_www_form_component(algorithm)}"
+        else
+          plain_string = "SAMLRequest=#{URI.encode_www_form_component(raw_saml_request)}&RelayState=#{URI.encode_www_form_component(relay_state)}&SigAlg=#{URI.encode_www_form_component(algorithm)}"
+        end
         case algorithm
         when 'http://www.w3.org/2000/09/xmldsig#rsa-sha1'
           digest = OpenSSL::Digest::SHA1.new
@@ -72,6 +76,10 @@ module SamlIdp
       ).build
 
       Base64.encode64(response_doc.to_xml)
+    end
+
+    def relay_state
+      params.has_key?(:RelayState) ? params[:RelayState] : nil
     end
 
     def issuer_uri
