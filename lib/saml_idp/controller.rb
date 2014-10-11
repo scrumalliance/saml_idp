@@ -21,29 +21,31 @@ module SamlIdp
       decode_request(raw_saml_request)
       algorithm = params[:SigAlg]
       signature = params[:Signature]
-      if !signature.nil? || !algorithm.nil?
-        raise "Missing part of signature" unless !signature.nil? && !algorithm.nil?
-        # TODO(awong): Get the raw parameters here. This is silly to reconstruct and
-        # somewhat unsafe.
-        if relay_state.nil?
-          plain_string = "SAMLRequest=#{URI.encode_www_form_component(raw_saml_request)}&SigAlg=#{URI.encode_www_form_component(algorithm)}"
-        else
-          plain_string = "SAMLRequest=#{URI.encode_www_form_component(raw_saml_request)}&RelayState=#{URI.encode_www_form_component(relay_state)}&SigAlg=#{URI.encode_www_form_component(algorithm)}"
+      if !service_provider[:cert].nil?
+        if !signature.nil? || !algorithm.nil?
+          raise "Missing part of signature" unless !signature.nil? && !algorithm.nil?
+          # TODO(awong): Get the raw parameters here. This is silly to reconstruct and
+          # somewhat unsafe.
+          if relay_state.nil?
+            plain_string = "SAMLRequest=#{URI.encode_www_form_component(raw_saml_request)}&SigAlg=#{URI.encode_www_form_component(algorithm)}"
+          else
+            plain_string = "SAMLRequest=#{URI.encode_www_form_component(raw_saml_request)}&RelayState=#{URI.encode_www_form_component(relay_state)}&SigAlg=#{URI.encode_www_form_component(algorithm)}"
+          end
+          case algorithm
+          when 'http://www.w3.org/2000/09/xmldsig#rsa-sha1'
+            digest = OpenSSL::Digest::SHA1.new
+          when 'http://www.w3.org/2001/04/xmlenc#sha256'
+            digest = OpenSSL::Digest::SHA256.new
+          when 'http://www.w3.org/2001/04/xmlenc#sha512'
+            digest = OpenSSL::Digest::SHA512.new
+          end
+          service_provider_cert = OpenSSL::X509::Certificate.new(service_provider[:cert])
+  #        if !service_provider_cert.public_key.verify(digest, Base64.urlsafe_decode64(signature), plain_string)
+  #          logger.error("Bad signature on get request")
+  #          render nothing: true, status: :forbidden
+  #          return
+  #        end
         end
-        case algorithm
-        when 'http://www.w3.org/2000/09/xmldsig#rsa-sha1'
-          digest = OpenSSL::Digest::SHA1.new
-        when 'http://www.w3.org/2001/04/xmlenc#sha256'
-          digest = OpenSSL::Digest::SHA256.new
-        when 'http://www.w3.org/2001/04/xmlenc#sha512'
-          digest = OpenSSL::Digest::SHA512.new
-        end
-        service_provider_cert = OpenSSL::X509::Certificate.new(service_provider[:cert])
-#        if !service_provider_cert.public_key.verify(digest, Base64.urlsafe_decode64(signature), plain_string)
-#          logger.error("Bad signature on get request")
-#          render nothing: true, status: :forbidden
-#          return
-#        end
       end
       render nothing: true, status: :forbidden unless valid_saml_request?
     end
