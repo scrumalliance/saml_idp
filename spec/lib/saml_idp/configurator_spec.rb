@@ -3,7 +3,9 @@ module SamlIdp
   describe Configurator do
     it { should respond_to :x509_certificate }
     it { should respond_to :secret_key }
-    it { should respond_to :algorithm }
+    it { should respond_to :signature_alg }
+    it { should respond_to :digest_alg }
+    it { should respond_to :verify_authnrequest_sig }
     it { should respond_to :organization_name }
     it { should respond_to :organization_url }
     it { should respond_to :base_saml_location }
@@ -22,8 +24,16 @@ module SamlIdp
       subject.secret_key.should == Default::SECRET_KEY
     end
 
-    it "has a valid algorithm" do
-      subject.algorithm.should == :sha1
+    it "has a valid signature algorithm" do
+      subject.signature_alg.should == 'rsa-sha256'
+    end
+
+    it "has a valid digest algorithm" do
+      subject.digest_alg.should == 'sha256'
+    end
+
+    it "forces authn validation by default" do
+      subject.verify_authnrequest_sig == true
     end
 
     it "has a valid reference_id_generator" do

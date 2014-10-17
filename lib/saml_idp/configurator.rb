@@ -4,8 +4,10 @@ module SamlIdp
   class Configurator
     attr_accessor :x509_certificate
     attr_accessor :secret_key
+    attr_accessor :signature_alg
+    attr_accessor :digest_alg
+    attr_accessor :verify_authnrequest_sig
     attr_accessor :password
-    attr_accessor :algorithm
     attr_accessor :organization_name
     attr_accessor :organization_url
     attr_accessor :base_saml_location
@@ -19,7 +21,10 @@ module SamlIdp
     def initialize
       self.x509_certificate = Default::X509_CERTIFICATE
       self.secret_key = Default::SECRET_KEY
-      self.algorithm = :sha1
+      self.signature_alg = 'rsa-sha256'
+      self.digest_alg = 'sha256'
+      # AuthnRequest signing doesn't lower attack surace. Disable by default.
+      self.verify_authnrequest_sig = false
       self.reference_id_generator = ->() { UUID.generate }
       self.service_provider = OpenStruct.new
       self.service_provider.finder = ->(_) { Default::SERVICE_PROVIDER }

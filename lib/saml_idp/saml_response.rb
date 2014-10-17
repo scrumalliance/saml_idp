@@ -12,9 +12,9 @@ module SamlIdp
                    audience_uri,
                    saml_request_id,
                    saml_acs_url,
-                   algorithm,
-                   authn_context_classref,
-                   sp_cert)
+                   signature_opts,
+                   encryption_opts,
+                   authn_context_classref)
       @reference_id = reference_id
       @response_id = response_id
       @issuer_uri = issuer_uri
@@ -22,9 +22,9 @@ module SamlIdp
       @audience_uri = audience_uri
       @saml_request_id = saml_request_id
       @saml_acs_url = saml_acs_url
-      @algorithm = algorithm
+      @signature_opts = signature_opts
+      @encryption_opts = encryption_opts
       @authn_context_classref = authn_context_classref
-      @sp_cert = (sp_cert.nil? || sp_cert.empty?) ? nil : OpenSSL::X509::Certificate.new(sp_cert) 
     end
 
     def build
@@ -34,12 +34,12 @@ module SamlIdp
   private
 
     def response_builder
-      if @sp_cert.nil?
-        ResponseBuilder.new(@response_id, @issuer_uri, @saml_acs_url, @saml_request_id,
-                            assertion_builder.build_signed_assertion)
-      else
+      if @encryption_opts.has_key?(:cert)
         ResponseBuilder.new(@response_id, @issuer_uri, @saml_acs_url, @saml_request_id,
                             assertion_builder.build_encrypted_assertion)
+      else
+        ResponseBuilder.new(@response_id, @issuer_uri, @saml_acs_url, @saml_request_id,
+                            assertion_builder.build_signed_assertion)
       end
     end
 
@@ -50,9 +50,9 @@ module SamlIdp
         @audience_uri,
         @saml_request_id,
         @saml_acs_url,
-        @algorithm,
-        @authn_context_classref,
-        @sp_cert
+        @signature_opts,
+        @encryption_opts,
+        @authn_context_classref
     end
   end
 end

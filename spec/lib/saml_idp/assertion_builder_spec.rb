@@ -2,6 +2,23 @@ require 'spec_helper'
 
 module SamlIdp
   describe AssertionBuilder do
+    let (:signature_opts) do
+      {
+        cert: SamlIdp.config.x509_certificate,
+        key: SamlIdp.config.secret_key,
+        signature_alg: 'rsa-sha256',
+        digest_alg: 'sha256',
+      }
+    end
+
+    let (:encryption_opts) do
+      {
+        key: OpenSSL::X509::Certificate.new(Default::SERVICE_PROVIDER_CERT).public_key.to_pem,
+        block_encryption: 'aes-256-cbc',
+        key_transport: 'rsa-oaep-mgf1p',
+      }
+    end
+
     subject { described_class.new(
       "abc",
       "http://sportngin.com",
@@ -9,9 +26,9 @@ module SamlIdp
       "http://example.com",
       "_123",
       "http://saml.acs.url",
-      :sha256,
+      signature_opts,
+      encryption_opts,
       Saml::XML::Namespaces::AuthnContext::ClassRef::PASSWORD,
-      Default::SERVICE_PROVIDER_CERT,
     )}
 
     it "builds a well-formed, unsigned, unencrypted SAML Assertion" do

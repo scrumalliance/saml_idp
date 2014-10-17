@@ -103,7 +103,9 @@ K8r42BP6/nB0U+Wniy1TK2jqGQ7o/F9InuGxyygek1poY2Ru/I9JfA==
 EOS
 
     SERVICE_PROVIDER = {
-      cert: SERVICE_PROVIDER_CERT
+      cert: SERVICE_PROVIDER_CERT,
+      block_encryption: 'aes256-cbc',
+      key_transport: 'rsa-oaep-mgf1p',
     }
   end
 end

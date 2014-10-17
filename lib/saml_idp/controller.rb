@@ -12,39 +12,55 @@ module SamlIdp
       helper_method :saml_acs_url if respond_to? :helper_method
     end
 
-    attr_accessor :algorithm
+    def initialize
+      self.signature_opts = {
+        cert: SamlIdp.config.x509_certificate,
+        key: SamlIdp.config.secret_key,
+        signature_alg: SamlIdp.config.signature_alg,
+        digest_alg: SamlIdp.config.digest_alg,
+      }
+    end
+
+    attr_accessor :signature_opts
     attr_accessor :saml_request
 
     protected
 
     def validate_saml_request(raw_saml_request = params[:SAMLRequest])
+      if raw_saml_request.nil?
+        render nothing: true, status: :forbidden
+        return
+      end
       decode_request(raw_saml_request)
-      algorithm = params[:SigAlg]
-      signature = params[:Signature]
-      if !service_provider[:cert].nil?
-        if !signature.nil? || !algorithm.nil?
-          raise "Missing part of signature" unless !signature.nil? && !algorithm.nil?
-          # TODO(awong): Get the raw parameters here. This is silly to reconstruct and
-          # somewhat unsafe.
-          if relay_state.nil?
-            plain_string = "SAMLRequest=#{URI.encode_www_form_component(raw_saml_request)}&SigAlg=#{URI.encode_www_form_component(algorithm)}"
-          else
-            plain_string = "SAMLRequest=#{URI.encode_www_form_component(raw_saml_request)}&RelayState=#{URI.encode_www_form_component(relay_state)}&SigAlg=#{URI.encode_www_form_component(algorithm)}"
-          end
-          case algorithm
-          when 'http://www.w3.org/2000/09/xmldsig#rsa-sha1'
-            digest = OpenSSL::Digest::SHA1.new
-          when 'http://www.w3.org/2001/04/xmlenc#sha256'
-            digest = OpenSSL::Digest::SHA256.new
-          when 'http://www.w3.org/2001/04/xmlenc#sha512'
-            digest = OpenSSL::Digest::SHA512.new
-          end
-          service_provider_cert = OpenSSL::X509::Certificate.new(service_provider[:cert])
-  #        if !service_provider_cert.public_key.verify(digest, Base64.urlsafe_decode64(signature), plain_string)
-  #          logger.error("Bad signature on get request")
-  #          render nothing: true, status: :forbidden
-  #          return
-  #        end
+      if SamlIdp.config.verify_authnrequest_sig
+        raise "AuthnRequest signature verification enfored. Must have cert." if service_provider[:cert].nil?
+
+        algorithm = params[:SigAlg]
+        signature = params[:Signature]
+
+        # TODO(awong): Return SAML Error here. Don't raise.
+        raise "Missing part of signature" unless !signature.nil? && !algorithm.nil?
+
+        # TODO(awong): Get the raw parameters here. This is silly to reconstruct and
+        # somewhat unsafe.
+        if relay_state.nil?
+          plain_string = "SAMLRequest=#{URI.encode_www_form_component(raw_saml_request)}&SigAlg=#{URI.encode_www_form_component(algorithm)}"
+        else
+          plain_string = "SAMLRequest=#{URI.encode_www_form_component(raw_saml_request)}&RelayState=#{URI.encode_www_form_component(relay_state)}&SigAlg=#{URI.encode_www_form_component(algorithm)}"
+        end
+        case algorithm
+        when 'http://www.w3.org/2000/09/xmldsig#rsa-sha1'
+          digest = OpenSSL::Digest::SHA1.new
+        when 'http://www.w3.org/2001/04/xmlenc#sha256'
+          digest = OpenSSL::Digest::SHA256.new
+        when 'http://www.w3.org/2001/04/xmlenc#sha512'
+          digest = OpenSSL::Digest::SHA512.new
+        end
+        service_provider_cert = OpenSSL::X509::Certificate.new(service_provider[:cert])
+        if !service_provider_cert.public_key.verify(digest, Base64.urlsafe_decode64(signature), plain_string)
+          logger.error("Bad signature on get request")
+          render nothing: true, status: :forbidden
+          return
         end
       end
       render nothing: true, status: :forbidden unless valid_saml_request?
@@ -59,9 +75,15 @@ module SamlIdp
       audience_uri = opts[:audience_uri] || saml_request.issuer || saml_acs_url[/^(.*?\/\/.*?\/)/, 1]
       opt_issuer_uri = opts[:issuer_uri] || issuer_uri
       authn_context_classref = opts[:authn_context_classref] || Saml::XML::Namespaces::AuthnContext::ClassRef::PASSWORD
-      service_provider_cert = service_provider[:cert]
-      if service_provider[:encrypted_assertions] && service_provider_cert.nil?
-        raise "Must have cert"
+
+      encryption_opts = {}
+      if service_provider[:block_encryption]
+        encryption_opts = {
+          cert: service_provider[:cert],
+          block_encryption: service_provider[:block_encryption],
+          key_transport: service_provider[:key_transport],
+        }
+        raise "Invalid encryption config for #{saml_request.issuer}" if encryption_opts[:cert].nil? || encryption_opts[:block_encryption].nil? || encryption_opts[:key_transport].nil?
       end
 
       response_doc = SamlResponse.new(
@@ -72,9 +94,9 @@ module SamlIdp
         audience_uri,
         saml_request_id,
         saml_acs_url,
-        algorithm,
-        authn_context_classref,
-        service_provider_cert
+        signature_opts,
+        encryption_opts[:block_encryption].nil? ? {} : encryption_opts,
+        authn_context_classref
       ).build
 
       Base64.encode64(response_doc.to_xml)

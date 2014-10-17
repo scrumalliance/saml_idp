@@ -51,8 +51,8 @@ module SamlIdp
       # with its validtion of the Reference URI and requires that the URI
       # be a valid intradoc id if using a #.
       doc = Nokogiri::XML(METADATA_ID_DOCTYPE + doc.root.to_xml)
-      doc.sign! certificate: @configurator.x509_certificate,
-        key: @configurator.secret_key, uri: "##{reference_string}"
+      doc.sign! cert: @configurator.x509_certificate,
+        key: @configurator.secret_key, uri: "##{reference_string}", signature_alg: 'rsa-sha256', digest_alg: 'sha256'
 
       # Per #2.3.2 the signature node, if present, must be the first element.
       signature = doc.xpath('//md:EntityDescriptor/ds:Signature',

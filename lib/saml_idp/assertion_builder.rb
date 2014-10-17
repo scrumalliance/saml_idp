@@ -2,20 +2,18 @@ require 'nokogiri'
 
 module SamlIdp
   class AssertionBuilder
-    delegate :config, to: :SamlIdp
-
     def initialize(reference_id, issuer_uri, principal, audience_uri,
-                   saml_request_id, saml_acs_url, signing_algorihm_UNUSED,
-                   authn_context_classref, sp_cert)
+                   saml_request_id, saml_acs_url, signature_opts,
+                   encryption_opts, authn_context_classref)
       @reference_id = reference_id
       @issuer_uri = issuer_uri
       @principal = principal
       @audience_uri = audience_uri
       @saml_request_id = saml_request_id
       @saml_acs_url = saml_acs_url
-      @signing_algorihm_UNUSED = signing_algorihm_UNUSED
+      @signature_opts = signature_opts
+      @encryption_opts = encryption_opts
       @authn_context_classref = authn_context_classref
-      @sp_cert = sp_cert
     end
 
     # Build a saml:Assertion per section #2.3.3.
@@ -128,8 +126,10 @@ module SamlIdp
       # be a valid intradoc id if using a #.
       doc = Nokogiri::XML(ASSERTION_ID_DOCTYPE + doc.root.to_xml)
       # The refernece string should be the ID of the <Assertion> block.
-      # TODO(awong): Use an xpath to find that rather than rereading reference_string.
-      doc.sign! certificate: config.x509_certificate, key: config.secret_key, uri: "##{reference_string}"
+      # TODO(awong): Use an xpath to find that rather than rereading reference_string
+      signature_opts = @signature_opts.clone
+      signature_opts[:uri] = "##{reference_string}"
+      doc.sign! signature_opts
       issuer = doc.xpath('//saml:Assertion/saml:Issuer',
                          'saml' => Saml::XML::Namespaces::ASSERTION)[0]
       signature = doc.xpath('//saml:Assertion/ds:Signature',
@@ -140,8 +140,13 @@ module SamlIdp
     end
 
     def build_encrypted_assertion
+      raise "Must have cert to encrypt" unless @encryption_opts.has_key?(:cert)
       doc = build_signed_assertion
-      doc.encrypt! key: @sp_cert.public_key.to_pem
+      encryption_opts = @encryption_opts.clone
+      encryption_opts[:key] =
+        OpenSSL::X509::Certificate.new(encryption_opts[:cert]).public_key.to_pem
+      doc.encrypt! encryption_opts
+
       # Create an EncryptionAssertion (#2.3.4)
       encrypted_assertion_builder = Nokogiri::XML::Builder.new do |xml|
         xml.EncryptedAssertion xmlns: Saml::XML::Namespaces::ASSERTION do
@@ -156,7 +161,7 @@ module SamlIdp
     def build_attribute_statement
       builder = Nokogiri::XML::Builder.new do |xml|
         xml.AttributeStatement do
-          config.attributes.each do |friendly_name, attrs|
+          SamlIdp.config.attributes.each do |friendly_name, attrs|
             attrs = (attrs || {}).with_indifferent_access
             xml.Attribute(Name: attrs[:name] || friendly_name,
                           NameFormat: attrs[:name_format] || Saml::XML::Namespaces::Formats::Attr::URI,
@@ -203,7 +208,7 @@ module SamlIdp
     end
 
     def name_id_format
-      @name_id_format ||= NameIdFormatter.new(config.name_id.formats).chosen
+      @name_id_format ||= NameIdFormatter.new(SamlIdp.config.name_id.formats).chosen
     end
 
     def reference_string
