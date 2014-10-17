@@ -35,29 +35,36 @@ module SamlIdp
       if SamlIdp.config.verify_authnrequest_sig
         raise "AuthnRequest signature verification enfored. Must have cert." if service_provider[:cert].nil?
 
-        algorithm = params[:SigAlg]
-        signature = params[:Signature]
+      binding.pry
+        raw_params = request.query_string.split('&')
+        saml_request_param = raw_params.select { |x| x =~ /^SAMLRequest=/ }[0]
+        algorithm_param = raw_params.select { |x| x =~ /^SigAlg=/ }[0]
+        relay_state_param = raw_params.select { |x| x =~ /^RelayState=/ }[0]
+        signature = raw_params.select { |x| x =~ /^Signature=/ }[0]
 
         # TODO(awong): Return SAML Error here. Don't raise.
-        raise "Missing part of signature" unless !signature.nil? && !algorithm.nil?
+        raise "Missing part of signature" unless !algorithm_param.nil? && !saml_request_param.nil? && !signature.nil?
 
         # TODO(awong): Get the raw parameters here. This is silly to reconstruct and
         # somewhat unsafe.
         if relay_state.nil?
-          plain_string = "SAMLRequest=#{URI.encode_www_form_component(raw_saml_request)}&SigAlg=#{URI.encode_www_form_component(algorithm)}"
+          plain_string = "#{saml_request_param}&#{algorithm_param}"
         else
-          plain_string = "SAMLRequest=#{URI.encode_www_form_component(raw_saml_request)}&RelayState=#{URI.encode_www_form_component(relay_state)}&SigAlg=#{URI.encode_www_form_component(algorithm)}"
+          plain_string = "#{saml_request_param}&#{relay_state_param}&#{algorithm_param}"
         end
-        case algorithm
+
+        case URI.decode_www_form_component(algorithm_param.split('=')[1])
         when 'http://www.w3.org/2000/09/xmldsig#rsa-sha1'
           digest = OpenSSL::Digest::SHA1.new
-        when 'http://www.w3.org/2001/04/xmlenc#sha256'
+        when 'http://www.w3.org/2001/04/xmldsig-more#rsa-sha256'
           digest = OpenSSL::Digest::SHA256.new
-        when 'http://www.w3.org/2001/04/xmlenc#sha512'
+        when 'http://www.w3.org/2001/04/xmldsig-more#rsa-sha512'
           digest = OpenSSL::Digest::SHA512.new
+        else
+          raise "Unknown sig algorithm: #{URI.decode_www_form_component(algorithm_param.split('=')[1])}"
         end
         service_provider_cert = OpenSSL::X509::Certificate.new(service_provider[:cert])
-        if !service_provider_cert.public_key.verify(digest, Base64.urlsafe_decode64(signature), plain_string)
+        if !service_provider_cert.public_key.verify(digest, Base64.decode64(signature), plain_string)
           logger.error("Bad signature on get request")
           render nothing: true, status: :forbidden
           return
@@ -77,7 +84,7 @@ module SamlIdp
       authn_context_classref = opts[:authn_context_classref] || Saml::XML::Namespaces::AuthnContext::ClassRef::PASSWORD
 
       encryption_opts = {}
-      if service_provider[:block_encryption]
+      if not service_provider[:block_encryption].nil?
         encryption_opts = {
           cert: service_provider[:cert],
           block_encryption: service_provider[:block_encryption],
@@ -95,7 +102,7 @@ module SamlIdp
         saml_request_id,
         saml_acs_url,
         signature_opts,
-        encryption_opts[:block_encryption].nil? ? {} : encryption_opts,
+        encryption_opts,
         authn_context_classref
       ).build
 

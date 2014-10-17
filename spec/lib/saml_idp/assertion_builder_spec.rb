@@ -6,16 +6,16 @@ module SamlIdp
       {
         cert: SamlIdp.config.x509_certificate,
         key: SamlIdp.config.secret_key,
-        signature_alg: 'rsa-sha256',
-        digest_alg: 'sha256',
+        signature_alg: SamlIdp.config.signature_alg,
+        digest_alg: SamlIdp.config.digest_alg
       }
     end
 
     let (:encryption_opts) do
       {
-        key: OpenSSL::X509::Certificate.new(Default::SERVICE_PROVIDER_CERT).public_key.to_pem,
-        block_encryption: 'aes-256-cbc',
-        key_transport: 'rsa-oaep-mgf1p',
+        key: OpenSSL::X509::Certificate.new(Default::SERVICE_PROVIDER[:cert]).public_key.to_pem,
+        block_encryption: Default::SERVICE_PROVIDER[:block_encryption],
+        key_transport: Default::SERVICE_PROVIDER[:key_transport],
       }
     end
 
