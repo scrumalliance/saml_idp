@@ -32,23 +32,31 @@ module SamlIdp
     end
 
     def request_id
-      authn_request["ID"]
+      return authn_request["ID"] if authn_request.present?
+      return logout_request["ID"] if logout_request.present?
+      nil
     end
 
-    def acs_url
-      service_provider.acs_url ||
-        authn_request["AssertionConsumerServiceURL"].to_s
+    def response_url
+      return service_provider.acs_url if xpath("//samlp:AuthnRequest", samlp: samlp).first.present?
+      return service_provider.sso_url if xpath("//samlp:LogoutRequest", samlp: samlp).first.present?
+      return nil
     end
 
     def valid?
-      # TODO(awong): This should validate against the schema.
+      # TODO(awong): This should validate against the schema. Also assert the
+      # existance of only 1 AuthnRequest or LogoutRequest. This is probably
+      # handled by schema.
       service_provider? &&
+        (authn_request.present? ^ logout_request.present?) &&
         valid_signature? &&
-        acs_url.present?
+        response_url.present?
     end
 
     def valid_signature?
-      service_provider.valid_signature? document
+      # Force signatures for logout requests because there is no other
+      # protection against a cross-site DoS.
+      service_provider.valid_signature? document, require_signature: logout_request.present?
     end
 
     def service_provider?
@@ -69,8 +77,11 @@ module SamlIdp
     end
 
     def authn_request
-      xpath("//samlp:AuthnRequest", samlp: samlp).first
-      # TODO(awong): Assert the existance of only 1 AuthnRequest.
+      @authn_request ||= xpath("//samlp:AuthnRequest", samlp: samlp).first
+    end
+
+    def logout_request
+      @logout_request ||= xpath("//samlp:LogoutRequest", samlp: samlp).first
     end
 
     def samlp

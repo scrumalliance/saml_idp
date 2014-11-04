@@ -5,11 +5,13 @@ require 'saml_idp/persisted_metadata'
 module SamlIdp
   class ServiceProvider
     include Attributeable
-    attribute :identifier
-    attribute :fingerprint
-    attribute :metadata_url
-    attribute :validate_signature
     attribute :acs_url
+    attribute :cert
+    attribute :fingerprint
+    attribute :identifier
+    attribute :metadata_url
+    attribute :sso_url
+    attribute :validate_signature
 
     delegate :config, to: :SamlIdp
 
@@ -17,9 +19,12 @@ module SamlIdp
       attributes.present?
     end
 
-    def valid_signature?(doc)
-      !should_validate_signature? ||
+    def valid_signature?(doc, require_signature: false)
+      if require_signature || should_validate_signature?
         doc.valid_signature?(fingerprint)
+      else
+        true
+      end
     end
 
     def should_validate_signature?

@@ -23,7 +23,7 @@ module SamlIdp
       self.secret_key = Default::SECRET_KEY
       self.signature_alg = 'rsa-sha256'
       self.digest_alg = 'sha256'
-      # AuthnRequest signing doesn't lower attack surace. Disable by default.
+      # AuthnRequest signing doesn't lower attack surface. Disable by default.
       self.verify_authnrequest_sig = false
       self.reference_id_generator = ->() { UUID.generate }
       self.service_provider = OpenStruct.new

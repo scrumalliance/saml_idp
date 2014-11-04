@@ -15,10 +15,11 @@ describe SamlIdp::Controller do
   end
 
   it "should find the SAML ACS URL" do
+    pending("Should this allow for non-metadata specified URLs?")
     requested_saml_acs_url = "https://example.com/saml/consume"
     params[:SAMLRequest] = make_saml_request(requested_saml_acs_url)
     validate_saml_request
-    saml_acs_url.should == requested_saml_acs_url
+    saml_response_url.should == requested_saml_acs_url
   end
 
   context "SAML Responses" do

@@ -30,7 +30,8 @@ UfgQaCushYgDDL5YbIQa++egCgpIZ+T0Dj5oRew//A==
 -----END CERTIFICATE-----
 EOC
 
-    FINGERPRINT = "9E:65:2E:03:06:8D:80:F2:86:C7:6C:77:A1:D9:14:97:0A:4D:F4:4D"
+    # TODO(awong): Which cert does this fingerprint match???
+    FINGERPRINT = "3E:8D:98:3B:2D:A0:42:00:BB:AB:3E:01:90:BC:6D:D6:DB:A1:6E:86"
     SECRET_KEY = <<EOS
 -----BEGIN RSA PRIVATE KEY-----
 MIICXAIBAAKBgQC4HLA82ULUWikYth8X3pKi2Irw2Pr+dbTzg7iiZEyJ/PLvH3nl
@@ -102,8 +103,12 @@ K8r42BP6/nB0U+Wniy1TK2jqGQ7o/F9InuGxyygek1poY2Ru/I9JfA==
 -----END RSA PRIVATE KEY-----
 EOS
 
+    # TODO(awong): localhost:3000 seems like the wrong default
     SERVICE_PROVIDER = {
       cert: SERVICE_PROVIDER_CERT,
+      fingerprint: FINGERPRINT,
+      acs_url: 'http://localhost:3000/saml/consume',
+      sso_url: 'http://localhost:3000/saml/sso_return',
       block_encryption: 'aes256-cbc',
       key_transport: 'rsa-oaep-mgf1p',
     }

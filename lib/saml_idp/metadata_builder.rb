@@ -46,19 +46,19 @@ module SamlIdp
             build_contact xml
           end
       end
-      doc = builder.doc
-      # Hack to add the METADATA_ID_DOCTYPE to the document. XMLSec is strict
-      # with its validtion of the Reference URI and requires that the URI
-      # be a valid intradoc id if using a #.
-      doc = Nokogiri::XML(METADATA_ID_DOCTYPE + doc.root.to_xml)
-      doc.sign! cert: @configurator.x509_certificate,
-        key: @configurator.secret_key, uri: "##{reference_string}", signature_alg: 'rsa-sha256', digest_alg: 'sha256'
+
+      # TODO(awong): This should be in the configurator directly.
+      signature_opts = {
+        cert: @configurator.x509_certificate,
+        key: @configurator.secret_key, 
+        signature_alg: 'rsa-sha256',
+        digest_alg: 'sha256'
+      }
+      doc = SamlIdp::sign_root_element(builder.doc, signature_opts)
 
       # Per #2.3.2 the signature node, if present, must be the first element.
-      signature = doc.xpath('//md:EntityDescriptor/ds:Signature',
-                            'md' => Saml::XML::Namespaces::METADATA,
+      signature = doc.xpath('/*/ds:Signature',
                             'ds' => Saml::XML::Namespaces::SIGNATURE)[0]
-      namespaces = signature.namespaces
       doc.root.first_element_child.add_previous_sibling(signature)
       doc
     end
@@ -159,13 +159,6 @@ module SamlIdp
       private delegatable
 
     end
-
-    METADATA_ID_DOCTYPE = <<DOCTYPE
-<!DOCTYPE EntityDescriptor [
-  <!ELEMENT EntityDescriptor (#PCDATA)>
-  <!ATTLIST EntityDescriptor ID ID #IMPLIED>
-]>
-DOCTYPE
 
   end
 end

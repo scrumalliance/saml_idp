@@ -120,23 +120,11 @@ module SamlIdp
     end
 
     def build_signed_assertion
-      doc = build_assertion
-      # Hack to add the ASSERTION_ID_DOCTYPE to the document. XMLSec is strict
-      # with its validtion of the Reference URI and requires that the URI
-      # be a valid intradoc id if using a #.
-      doc = Nokogiri::XML(ASSERTION_ID_DOCTYPE + doc.root.to_xml)
-      # The refernece string should be the ID of the <Assertion> block.
-      # TODO(awong): Use an xpath to find that rather than rereading reference_string
-      signature_opts = @signature_opts.clone
-      signature_opts[:uri] = "##{reference_string}"
-      doc.sign! signature_opts
-      issuer = doc.xpath('//saml:Assertion/saml:Issuer',
-                         'saml' => Saml::XML::Namespaces::ASSERTION)[0]
-      signature = doc.xpath('//saml:Assertion/ds:Signature',
-                            'saml' => Saml::XML::Namespaces::ASSERTION,
-                            'ds' => Saml::XML::Namespaces::SIGNATURE)[0]
-      issuer.add_next_sibling(signature)
-      doc
+      SamlIdp::sign_root_element(
+        build_assertion,
+        @signature_opts,
+        '/saml:Assertion/saml:Issuer',
+        { saml: Saml::XML::Namespaces::ASSERTION })
     end
 
     def build_encrypted_assertion
@@ -239,12 +227,5 @@ module SamlIdp
     def iso
       yield.iso8601
     end
-
-    ASSERTION_ID_DOCTYPE = <<DOCTYPE
-<!DOCTYPE Assertion [
-  <!ELEMENT Assertion (#PCDATA)>
-  <!ATTLIST Assertion ID ID #IMPLIED>
-]>
-DOCTYPE
   end
 end

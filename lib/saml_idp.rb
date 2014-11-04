@@ -21,6 +21,25 @@ module SamlIdp
   def self.metadata
     @metadata ||= MetadataBuilder.new(config)
   end
+
+  def self.sign_root_element(doc, signature_opts, path_to_prev_sibling_of_signature = nil, namespaces = nil)
+    # xmldsig expects the tag being signed has an id field that it can reference.
+    tag_to_sign = doc.first_element_child.name
+    dtd = "<!DOCTYPE #{tag_to_sign} [ <!ELEMENT #{tag_to_sign} (#PCDATA)> <!ATTLIST #{tag_to_sign} ID ID #IMPLIED> ]>"
+
+    doc = Nokogiri::XML(dtd + doc.root.to_xml)
+    cloned_signature_opts = signature_opts.clone
+    cloned_signature_opts[:uri] = "##{doc.first_element_child[:ID]}"
+    doc.sign! cloned_signature_opts
+    if path_to_prev_sibling_of_signature
+      signature = doc.xpath('/*/ds:Signature', 'ds' => Saml::XML::Namespaces::SIGNATURE)[0]
+      prev_node = doc.xpath(path_to_prev_sibling_of_signature, namespaces)[0]
+      prev_node.add_next_sibling(signature)
+    end
+    no_dtd = Nokogiri::XML('<dummy />')
+    no_dtd.root.replace(doc.root)
+    no_dtd
+  end
 end
 
 # TODO Needs extraction out
