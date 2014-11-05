@@ -4,48 +4,44 @@
   <Signature xmlns="http://www.w3.org/2000/09/xmldsig#">
     <SignedInfo>
       <CanonicalizationMethod Algorithm="http://www.w3.org/2001/10/xml-exc-c14n#"/>
-      <SignatureMethod Algorithm="http://www.w3.org/2000/09/xmldsig#rsa-sha1"/>
+      <SignatureMethod Algorithm="http://www.w3.org/2001/04/xmldsig-more#rsa-sha256"/>
       <Reference URI="#_abc">
         <Transforms>
           <Transform Algorithm="http://www.w3.org/2000/09/xmldsig#enveloped-signature"/>
           <Transform Algorithm="http://www.w3.org/2001/10/xml-exc-c14n#"/>
         </Transforms>
-        <DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha1"/>
-        <DigestValue>CMG8Q0nql3MsOiXCpFPAUudMe9c=</DigestValue>
+        <DigestMethod Algorithm="http://www.w3.org/2001/04/xmlenc#sha256"/>
+        <DigestValue>ocfwvBimJ+poITyaDvKy/BsMFzWhJc1v7eIXMw4avhY=</DigestValue>
       </Reference>
     </SignedInfo>
-    <SignatureValue>QYsZrMX1q9dzp9vl1y7xp4PU9lYvkSWm62PUCYpJ83+Nt7cOmdD+klxc6VKfq24j
-xqWV7YSVF+rmQGiWvH5d0QsgUV9AMTOYkBwVmpaF3y/IS6tTPmt+PjOI512CbGzg
-uXRnPhQdOcRKBoqnQeYN/AwNLbf5EFyvgcDzrrCE6xw=</SignatureValue>
+    <SignatureValue>dta9jbtA3JRrw2s71uAbxKOAz98dn8gSc1a4fKakog8Y+VNRK5tWlglTv5Fh360SsvuAAwuDzRUhuKrcWde+QaPHJqO5J+xkIOGrz+FIu0AMWhbPPUmNac4AFgH4QyaaTgoSc4hwm9iAFXYnTPe771zNxQHEJ06jzDHc0YTJE87uDmk0tzHvCPT4mjIGXEzYrbGrmAJUbhTcv3LNvEQfyt84KseOdXEOVwYfF1nBCxr/YNbEDq2HMzqbuRsVYD1/rA91b2gbC1OrxULTQObDY2w1rK/tx7fVtJ0bJ0Mf5TZv5Dr38WdR3+V9g0GOHiMNG05GtQcxKW9lmXMFGVMcIA==</SignatureValue>
     <KeyInfo>
       <X509Data>
-        <X509Certificate>MIIDqzCCAxSgAwIBAgIBATANBgkqhkiG9w0BAQsFADCBhjELMAkGA1UEBhMCQVUx
-DDAKBgNVBAgTA05TVzEPMA0GA1UEBxMGU3lkbmV5MQwwCgYDVQQKDANQSVQxCTAH
-BgNVBAsMADEYMBYGA1UEAwwPbGF3cmVuY2VwaXQuY29tMSUwIwYJKoZIhvcNAQkB
-DBZsYXdyZW5jZS5waXRAZ21haWwuY29tMB4XDTEyMDQyODAyMjIyOFoXDTMyMDQy
-MzAyMjIyOFowgYYxCzAJBgNVBAYTAkFVMQwwCgYDVQQIEwNOU1cxDzANBgNVBAcT
-BlN5ZG5leTEMMAoGA1UECgwDUElUMQkwBwYDVQQLDAAxGDAWBgNVBAMMD2xhd3Jl
-bmNlcGl0LmNvbTElMCMGCSqGSIb3DQEJAQwWbGF3cmVuY2UucGl0QGdtYWlsLmNv
-bTCBnzANBgkqhkiG9w0BAQEFAAOBjQAwgYkCgYEAuBywPNlC1FopGLYfF96SotiK
-8Nj6/nW084O4omRMifzy7x955RLEy673q2aiJNB3LvE6Xvkt9cGtxtNoOXw1g2Uv
-HKpldQbr6bOEjLNeDNW7j0ob+JrRvAUOK9CRgdyw5MC6lwqVQQ5C1DnaT/2fSBFj
-asBFTR24dEpfTy8HfKECAwEAAaOCASUwggEhMAkGA1UdEwQCMAAwCwYDVR0PBAQD
-AgUgMB0GA1UdDgQWBBQNBGmmt3ytKpcJaBaYNbnyU2xkazATBgNVHSUEDDAKBggr
-BgEFBQcDATAdBglghkgBhvhCAQ0EEBYOVGVzdCBYNTA5IGNlcnQwgbMGA1UdIwSB
-qzCBqIAUDQRpprd8rSqXCWgWmDW58lNsZGuhgYykgYkwgYYxCzAJBgNVBAYTAkFV
-MQwwCgYDVQQIEwNOU1cxDzANBgNVBAcTBlN5ZG5leTEMMAoGA1UECgwDUElUMQkw
-BwYDVQQLDAAxGDAWBgNVBAMMD2xhd3JlbmNlcGl0LmNvbTElMCMGCSqGSIb3DQEJ
-AQwWbGF3cmVuY2UucGl0QGdtYWlsLmNvbYIBATANBgkqhkiG9w0BAQsFAAOBgQAE
-cVUPBX7uZmzqZJfy+tUPOT5ImNQj8VE2lerhnFjnGPHmHIqhpzgnwHQujJfs/a30
-9Wm5qwcCaC1eO5cWjcG0x3OjdllsgYDatl5GAumtBx8J3NhWRqNUgitCIkQlxHIw
-UfgQaCushYgDDL5YbIQa++egCgpIZ+T0Dj5oRew//A==</X509Certificate>
+        <X509Certificate>MIIDXDCCAkQCCQC51/Vezu6XQTANBgkqhkiG9w0BAQsFADBwMQswCQYDVQQGEwJV
+UzETMBEGA1UECBMKV2FzaGluZ3RvbjEQMA4GA1UEBxMHU2VhdHRsZTERMA8GA1UE
+ChMISDhYTUxTZWMxCzAJBgNVBAsTAkg4MRowGAYDVQQDExFodHRwczovL2xvY2Fs
+aG9zdDAeFw0xNDExMDUyMTA1MzhaFw0yNDExMDIyMTA1MzhaMHAxCzAJBgNVBAYT
+AlVTMRMwEQYDVQQIEwpXYXNoaW5ndG9uMRAwDgYDVQQHEwdTZWF0dGxlMREwDwYD
+VQQKEwhIOFhNTFNlYzELMAkGA1UECxMCSDgxGjAYBgNVBAMTEWh0dHBzOi8vbG9j
+YWxob3N0MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAzH95S1WHsk6u
+hdNK04iMEjdXSL2Dw0YipB25mx3DlMgtRjk/PMJ5ZFJkuU26bVzpWyRO9AvaYj48
+u3tnWaGfrZV/CQ8rwkUbntChglxFlOtqDAtN+KGuKOSM9e6dAGqtqq0sTNyYwXtE
+8Ho3ZtxlUTw1GNCT/SI5qtDr1ON172awWFYacN137EGDBkCgDMKXdqUFuDfB7cnR
+kbvJUzvu+NQjkdYmCTArbH+akMEh2Ln+i9j6VmsS7aNgX5GYpN8ir+NjxN6QYc9K
+wJRYBHSsJb5DZqrdOprAXk1J11fWrzBA1tudv2QOwkAj/Nl61SNlOmUo1RFEVWDi
+q9xI9lT50QIDAQABMA0GCSqGSIb3DQEBCwUAA4IBAQA8/E+Nv30/AwtfKVh/Eym0
+TtEcHcq9cetD5gVRXFK/MCoccKonpsmkR/cxwEwsgApb5ycCq0xthkhVnzhFq22J
+2kPlWHBryAJSSqlnmSavJNzwRwu+sIas/ctwSD4hyqOzdb9MVe2rNOANXL3ICBDT
+q8YGGmLjYJYLG/iH/3V5jTakW+CrxWwzQOyYAT3pnWkT9oO/7JoL7BPgtsCgcbSy
+voouaKe1wvNWe2bdLO/W5Lh4rtFMUC4r5dBhRhT7qkLw2ZTP7YhTE0jA6ITQy1Nf
+xeMf79IFVRcxhn+2JTdZhkPdUjaeQLZ/8aU9IkPL2Kj6wckqMKKepa7oH20XBOjN</X509Certificate>
       </X509Data>
     </KeyInfo>
   </Signature>
   <Subject>
     <NameID Format="urn:oasis:names:tc:SAML:1.1:nameid-format:emailAddress">foo@example.com</NameID>
     <SubjectConfirmation Method="urn:oasis:names:tc:SAML:2.0:cm:bearer">
-      <SubjectConfirmationData InResponseTo="123" NotOnOrAfter="2010-06-01T13:03:00Z" Recipient="http://saml.acs.url"/>
+      <SubjectConfirmationData InResponseTo="_123" NotOnOrAfter="2010-06-01T13:03:00Z" Recipient="http://saml.acs.url"/>
     </SubjectConfirmation>
   </Subject>
   <Conditions NotBefore="2010-06-01T12:59:55Z" NotOnOrAfter="2010-06-01T14:00:00Z">
@@ -53,14 +49,14 @@ UfgQaCushYgDDL5YbIQa++egCgpIZ+T0Dj5oRew//A==</X509Certificate>
       <Audience>http://example.com</Audience>
     </AudienceRestriction>
   </Conditions>
-  <AttributeStatement>
-    <Attribute Name="email-address" NameFormat="urn:oasis:names:tc:SAML:2.0:attrname-format:uri" FriendlyName="emailAddress">
-      <AttributeValue>foo@example.com</AttributeValue>
-    </Attribute>
-  </AttributeStatement>
   <AuthnStatement AuthnInstant="2010-06-01T13:00:00Z" SessionIndex="_abc">
     <AuthnContext>
       <AuthnContextClassRef>urn:oasis:names:tc:SAML:2.0:ac:classes:Password</AuthnContextClassRef>
     </AuthnContext>
   </AuthnStatement>
+  <AttributeStatement>
+    <Attribute Name="email-address" NameFormat="urn:oasis:names:tc:SAML:2.0:attrname-format:uri" FriendlyName="emailAddress">
+      <AttributeValue>foo@example.com</AttributeValue>
+    </Attribute>
+  </AttributeStatement>
 </Assertion>

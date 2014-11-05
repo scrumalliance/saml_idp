@@ -3,6 +3,7 @@ require 'base64'
 require 'time'
 require 'uuid'
 require 'saml_idp/request'
+require 'saml_idp/logout_response_builder'
 
 module SamlIdp
   module Controller
@@ -75,10 +76,7 @@ module SamlIdp
     end
 
     def decode_request(raw_saml_request)
-      # TODO(awong): Fix unitteset to not require this conditional.
-      method = defined?(request) ? request.request_method : 'GET'
-
-      case method
+      case request.request_method
       when "POST"
         self.saml_request = Request.new raw_saml_request
       when "GET"
@@ -166,7 +164,7 @@ module SamlIdp
           authn_context_classref
         ).build
       elsif saml_request.logout_request.present?
-        LogoutResponseBuilder.new(
+        SamlIdp::LogoutResponseBuilder.new(
           response_id,
           opt_issuer_uri,
           saml_response_url,

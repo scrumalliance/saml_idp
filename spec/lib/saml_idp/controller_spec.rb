@@ -15,6 +15,18 @@ describe SamlIdp::Controller do
     @params ||= {}
   end
 
+  class MockRequest
+    attr_accessor :request_method, :url
+    def initialize(method='GET', url='http://example.com')
+      @request_method = method
+      @url = url
+    end
+  end
+
+  def request
+    @request ||= MockRequest.new
+  end
+
   it "should find the SAML ACS URL" do
     pending("Should this allow for non-metadata specified URLs?")
     requested_saml_acs_url = "https://example.com/saml/consume"
@@ -113,16 +125,21 @@ describe SamlIdp::Controller do
         'some_qualifier',
         'abc123index',
         signature_opts).build.to_xml
+      @request = MockRequest.new('POST')
       validate_saml_request
     end
 
     it "should generate a signed LogoutResponse to the request" do
-      puts response_doc(nil).to_xml
-      signed_doc = XMLSecurity::SignedDocument.new( response_doc(nil).to_xml)
-
-      cert = OpenSSL::X509::Certificate.new(self.signature_opts.cert)
+      signed_doc = Saml::XML::Document.parse(response_doc(nil).to_xml)
+      cert = OpenSSL::X509::Certificate.new(self.signature_opts[:cert])
       fingerprint = OpenSSL::Digest::SHA256.new(cert.to_der).hexdigest
-      signed_doc.validate(fingerprint, soft = false)
+      expect(signed_doc.signed?).to be_truthy
+      expect(signed_doc.valid_signature?(fingerprint)).to be_truthy
+      expect(signed_doc.at_xpath('/samlp:LogoutResponse', samlp: Saml::XML::Namespaces::PROTOCOL)).to be_present
+      status_node = signed_doc.at_xpath('/samlp:LogoutResponse/samlp:Status/samlp:StatusCode',
+                                        samlp: Saml::XML::Namespaces::PROTOCOL)
+      expect(status_node).to be_present
+      expect(status_node.attributes["Value"].value).to eql(Saml::XML::Namespaces::Statuses::SUCCESS)
     end
   end
 end

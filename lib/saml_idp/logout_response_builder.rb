@@ -13,12 +13,12 @@ module SamlIdp
 
     def build
       builder = Nokogiri::XML::Builder.new do |xml|
-        xml.Response(xmlns: Saml::XML::Namespaces::PROTOCOL,
-                     ID: response_id_string,
-                     Version: "2.0",
-                     IssueInstant: now_iso,
-                     Destination: @saml_slo_url,
-                     InResponseTo: @saml_request_id) do
+        xml.LogoutResponse(xmlns: Saml::XML::Namespaces::PROTOCOL,
+                           ID: response_id_string,
+                           Version: "2.0",
+                           IssueInstant: now_iso,
+                           Destination: @saml_slo_url,
+                           InResponseTo: @saml_request_id) do
           xml.Issuer @issuer_uri, xmlns: Saml::XML::Namespaces::ASSERTION
           xml.Status do
             xml.StatusCode Value: Saml::XML::Namespaces::Statuses::SUCCESS 
@@ -26,7 +26,7 @@ module SamlIdp
         end
       end
       SamlIdp::sign_root_element(
-        builder.doc
+        builder.doc,
         @signature_opts,
         '/*/saml:Issuer',
         { saml: Saml::XML::Namespaces::ASSERTION })

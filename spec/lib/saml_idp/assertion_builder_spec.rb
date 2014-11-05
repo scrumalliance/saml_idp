@@ -60,20 +60,20 @@ module SamlIdp
 
         def get_signature_node(my_doc)
           nodeset = my_doc.xpath(
-            '//saml:Assertion/ds:Signature/ds:SignatureValue',
+            '/saml:Assertion/ds:Signature/ds:SignatureValue',
             saml:  Saml::XML::Namespaces::ASSERTION,
             ds: Saml::XML::Namespaces::SIGNATURE)
           expect(nodeset.length).to equal(1)
           nodeset.first
         end
 
-        def get_signature(my_doc)
+        def get_signature_value(my_doc)
           get_signature_node(my_doc).content.gsub(/\s+/, "")
         end
 
         def get_certificate_node(my_doc)
           nodeset = my_doc.xpath(
-            '//saml:Assertion/ds:Signature/ds:KeyInfo/ds:X509Data/ds:X509Certificate',
+            '/saml:Assertion/ds:Signature/ds:KeyInfo/ds:X509Data/ds:X509Certificate',
             saml:  Saml::XML::Namespaces::ASSERTION,
             ds: Saml::XML::Namespaces::SIGNATURE)
           expect(nodeset.length).to equal(1)
@@ -84,7 +84,7 @@ module SamlIdp
           get_certificate_node(my_doc).content.gsub(/\s+/, "")
         end
 
-        expect(get_signature(signed_assertion)).to eq(get_signature(golden))
+        expect(get_signature_value(signed_assertion)).to eq(get_signature_value(golden))
         expect(get_certificate(signed_assertion)).to eq(get_certificate(golden))
 
         # Remove the signature node before comparing the rest of the document.
@@ -93,8 +93,7 @@ module SamlIdp
         get_certificate_node(signed_assertion).remove
         get_certificate_node(golden).remove
 
-        # TODO(awong): Have to remove the DTD from the assertion builder.
-        #expect(signed_assertion).to be_equivalent_to(golden).respecting_element_order
+        expect(signed_assertion).to be_equivalent_to(golden).respecting_element_order
       end
     end
   end

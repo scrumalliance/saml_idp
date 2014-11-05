@@ -12,7 +12,7 @@ module SamlRequestMacros
     settings.issuer = "http://example.com/issuer"
     settings.idp_sso_target_url = "http://idp.com/saml/idp"
     settings.idp_cert = SamlIdp::Default::X509_CERTIFICATE
-    settings.idp_cert_fingerprint = SamlIdp::Default::FINGERPRINT
+    settings.idp_cert_fingerprint = SamlIdp::Default::IDP_FINGERPRINT
     settings.name_identifier_format = SamlIdp::Default::NAME_ID_FORMAT
     settings
   end

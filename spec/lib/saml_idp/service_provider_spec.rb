@@ -10,7 +10,7 @@ module SamlIdp
 
     describe "with attributes" do
       let(:attributes) { { fingerprint: fingerprint, metadata_url: metadata_url } }
-      let(:fingerprint) { Default::FINGERPRINT }
+      let(:fingerprint) { Default::SP_FINGERPRINT }
       let(:metadata_url) { "http://localhost:3000/metadata" }
 
       it "has a valid fingerprint" do

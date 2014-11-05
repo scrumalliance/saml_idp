@@ -1,4 +1,3 @@
-require 'saml_idp/xml_security'
 require 'saml_idp/service_provider'
 module SamlIdp
   class Request

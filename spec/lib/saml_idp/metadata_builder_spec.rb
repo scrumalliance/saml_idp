@@ -7,8 +7,8 @@ module SamlIdp
         fixture_path('schemas/saml-schema-metadata-2.0.xsd'))
 
       # TODO(awong): Make sure all golden test files are signed with the same cert/key pair.
-      FINGERPRINT = "9E:65:2E:03:06:8D:80:F2:86:C7:6C:77:A1:D9:14:97:0A:4D:F4:4D"
-      expect(Saml::XML::Document.parse(metadata.to_xml).valid_signature?(FINGERPRINT)).to be_truthy
+      expect(Saml::XML::Document.parse(metadata.to_xml).valid_signature?(
+        SamlIdp::Default::IDP_FINGERPRINT)).to be_truthy
     end
 
     it "has expected fields" do

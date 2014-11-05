@@ -28,14 +28,12 @@ module SamlIdp
         end
       end
 
-      x = SamlIdp::sign_root_element(
+      SamlIdp::sign_root_element(
         logout_request_builder.doc,
         @signature_opts,
         '/samlp:LogoutRequest/saml:Issuer',
        { samlp: Saml::XML::Namespaces::PROTOCOL,
          saml: Saml::XML::Namespaces::ASSERTION })
-          puts x
-      x
     end
 
   private
