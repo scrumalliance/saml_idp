@@ -75,7 +75,10 @@ module SamlIdp
     end
 
     def decode_request(raw_saml_request)
-      case request.request_method
+      # TODO(awong): Fix unitteset to not require this conditional.
+      method = defined?(request) ? request.request_method : 'GET'
+
+      case method
       when "POST"
         self.saml_request = Request.new raw_saml_request
       when "GET"
@@ -89,36 +92,12 @@ module SamlIdp
       end
     end
 
+    def response_doc(principal, opts = {})
+      build_response_doc(principal, opts)
+    end
+    
     def encode_response(principal, opts = {})
-      response_id, reference_id = get_saml_response_id, get_saml_reference_id
-      audience_uri = opts[:audience_uri] || saml_request.issuer || saml_response_url[/^(.*?\/\/.*?\/)/, 1]
-      opt_issuer_uri = opts[:issuer_uri] || issuer_uri
-      authn_context_classref = opts[:authn_context_classref] || Saml::XML::Namespaces::AuthnContext::ClassRef::PASSWORD
-
-      encryption_opts = {}
-      if not service_provider[:block_encryption].nil?
-        encryption_opts = {
-          cert: service_provider[:cert],
-          block_encryption: service_provider[:block_encryption],
-          key_transport: service_provider[:key_transport],
-        }
-        raise "Invalid encryption config for #{saml_request.issuer}" if encryption_opts[:cert].nil? || encryption_opts[:block_encryption].nil? || encryption_opts[:key_transport].nil?
-      end
-
-      response_doc = SamlResponse.new(
-        reference_id,
-        response_id,
-        opt_issuer_uri,
-        principal,
-        audience_uri,
-        saml_request_id,
-        saml_response_url,
-        signature_opts,
-        encryption_opts,
-        authn_context_classref
-      ).build
-
-      Base64.encode64(response_doc.to_xml)
+      Base64.encode64(response_doc(principal, opts).to_xml)
     end
 
     def relay_state
@@ -153,6 +132,50 @@ module SamlIdp
 
     def service_provider
       SamlIdp.config.service_provider.finder.(saml_request.issuer)
+    end
+
+    def build_response_doc(principal, opts)
+      response_id = get_saml_response_id
+      opt_issuer_uri = opts[:issuer_uri] || issuer_uri
+
+      if saml_request.authn_request.present?
+        audience_uri = opts[:audience_uri] || saml_request.issuer || saml_response_url[/^(.*?\/\/.*?\/)/, 1]
+        reference_id = get_saml_reference_id
+        authn_context_classref = opts[:authn_context_classref] || Saml::XML::Namespaces::AuthnContext::ClassRef::PASSWORD
+
+        encryption_opts = {}
+        if not service_provider[:block_encryption].nil?
+          encryption_opts = {
+            cert: service_provider[:cert],
+            block_encryption: service_provider[:block_encryption],
+            key_transport: service_provider[:key_transport],
+          }
+          raise "Invalid encryption config for #{saml_request.issuer}" if encryption_opts[:cert].nil? || encryption_opts[:block_encryption].nil? || encryption_opts[:key_transport].nil?
+        end
+
+        SamlResponse.new(
+          reference_id,
+          response_id,
+          opt_issuer_uri,
+          principal,
+          audience_uri,
+          saml_request_id,
+          saml_response_url,
+          signature_opts,
+          encryption_opts,
+          authn_context_classref
+        ).build
+      elsif saml_request.logout_request.present?
+        LogoutResponseBuilder.new(
+          response_id,
+          opt_issuer_uri,
+          saml_response_url,
+          saml_request_id,
+          signature_opts
+        ).build
+      else
+        raise "Unknown request #{saml_request}"
+      end
     end
   end
 end

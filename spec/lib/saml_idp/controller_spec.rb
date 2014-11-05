@@ -1,5 +1,6 @@
 # encoding: utf-8
 require 'spec_helper'
+require 'saml_idp/logout_request_builder'
 
 describe SamlIdp::Controller do
   include SamlIdp::Controller
@@ -24,6 +25,7 @@ describe SamlIdp::Controller do
 
   context "SAML Responses" do
     before(:each) do
+      # TODO(awong): Test POST.
       params[:SAMLRequest] = make_saml_request
       validate_saml_request
     end
@@ -37,8 +39,6 @@ describe SamlIdp::Controller do
     end
 
     it "should create an Encrypted, signed SAML Response" do
-      self.signature_opts[:signature_alg] = 'rsa-sha256'
-      self.signature_opts[:digest_method] = 'sha256'
       saml_response = encode_response(principal)
       response = OneLogin::RubySaml::Response.new(
         saml_response,
@@ -67,6 +67,8 @@ describe SamlIdp::Controller do
 
     ['rsa-sha1', 'rsa-sha256', 'rsa-sha384', 'rsa-sha512'].each do |algorithm_name|
       skip "should create a SAML Response using the #{algorithm_name} algorithm" do
+        # TODO(awong): This should not modify self.signature_opts as it causes
+        # test ordering dependencies.
         signature_alg = algorithm_name
         digest_alg = algorithm_name.split('-')[1]
         self.signature_opts[:signature_alg] = signature_alg
@@ -100,4 +102,27 @@ describe SamlIdp::Controller do
     end
   end
 
+  context "Single Logout" do
+    before(:each) do
+      # TODO(awong): Test POST.
+      params[:SAMLRequest] = SamlIdp::LogoutRequestBuilder.new(
+        '_response_id',
+        'localhost:3000',
+        'http://localhost:1337/saml/logout',
+        'himom',
+        'some_qualifier',
+        'abc123index',
+        signature_opts).build.to_xml
+      validate_saml_request
+    end
+
+    it "should generate a signed LogoutResponse to the request" do
+      puts response_doc(nil).to_xml
+      signed_doc = XMLSecurity::SignedDocument.new( response_doc(nil).to_xml)
+
+      cert = OpenSSL::X509::Certificate.new(self.signature_opts.cert)
+      fingerprint = OpenSSL::Digest::SHA256.new(cert.to_der).hexdigest
+      signed_doc.validate(fingerprint, soft = false)
+    end
+  end
 end
