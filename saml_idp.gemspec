@@ -39,7 +39,8 @@ Gem::Specification.new do |s|
   s.add_development_dependency("timecop")
   s.add_development_dependency("guard-bundler")
   s.add_development_dependency("guard-rspec")
-  s.add_development_dependency("pry-byebug")
+  s.add_development_dependency "pry-nav" if RUBY_VERSION < "2.0.0"
+  s.add_development_dependency "pry-byebug" if RUBY_VERSION >= "2.0.0"
   s.add_development_dependency("equivalent-xml")
 end
 
