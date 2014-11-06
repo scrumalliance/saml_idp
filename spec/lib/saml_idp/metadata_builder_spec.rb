@@ -13,7 +13,15 @@ module SamlIdp
 
     it "has expected fields" do
       # Rip the assertion into a separate doc for more stabe comparisons.
-      expect(subject.build).to be_equivalent_to(fixture('metadata.xml')).respecting_element_order
+      generated_doc = subject.build
+      expected_doc = Nokogiri::XML(fixture("metadata.xml"))
+
+      # Signature node just gets in the way of checking fields. Remove it.
+      signature_node = generated_doc.xpath('/*/ds:Signature', ds: Saml::XML::Namespaces::SIGNATURE)[0]
+      expect(signature_node.present?).to be_truthy
+      signature_node.remove
+
+      expect(generated_doc).to be_equivalent_to(expected_doc).respecting_element_order
     end
   end
 end

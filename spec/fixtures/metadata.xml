@@ -1,12 +1,6 @@
 <?xml version="1.0"?>
 <EntityDescriptor xmlns="urn:oasis:names:tc:SAML:2.0:metadata" xmlns:saml="urn:oasis:names:tc:SAML:2.0:assertion" ID="_b0e454a0-2ffb-0132-36d4-6c40088ec1f6" entityID="">
-  <Signature xmlns="http://www.w3.org/2000/09/xmldsig#"><SignedInfo><CanonicalizationMethod Algorithm="http://www.w3.org/2001/10/xml-exc-c14n#"/><SignatureMethod Algorithm="http://www.w3.org/2001/04/xmldsig-more#rsa-sha256"/><Reference URI="#_b0e454a0-2ffb-0132-36d4-6c40088ec1f6"><Transforms><Transform Algorithm="http://www.w3.org/2000/09/xmldsig#enveloped-signature"/><Transform Algorithm="http://www.w3.org/2001/10/xml-exc-c14n#"/></Transforms><DigestMethod Algorithm="http://www.w3.org/2001/04/xmlenc#sha256"/><DigestValue>ul/2+FWECLXijLUxmrFfH9bzcTmg/uldr6OzLjv45Fk=</DigestValue></Reference></SignedInfo><SignatureValue>tEKVBPmsBF0QznT2MeppVBWo6XLLUEQltcAULa/YgeWagRa/GznpmJ7WDCoOSmvW
-       4WZ44ayuP3LaSEjH9mbscotuLToIGqvmYAoQgwRl4masO4DmsesoDSmhU9MnFe6r
-       pn+2AiOAL5OKUnPcuYaPeS0YgJd+lrSVVmilSN/M5ZI5exPywI5JJJkXDdgyTkwe
-       T4rlLxp8g3+9gWXPgiJwWJFKvfdI5or5gu4dKSF62gKGk1KPS5TXxtVHAwVCd6Fm
-       xXwQFqSNh+DI7+pE5AMpyNSCWmuTgAItvbLRqUMLovaD5tTB28v1jnyqzvtFTlci
-       7gj/8ROcnQpqdfS14DLp0w==</SignatureValue><KeyInfo><X509Data>
-       <X509Certificate>
+<IDPSSODescriptor protocolSupportEnumeration="urn:oasis:names:tc:SAML:2.0:protocol"><KeyDescriptor use="signing"><KeyInfo xmlns="http://www.w3.org/2000/09/xmldsig#"><X509Data><X509Certificate>
        MIIDXDCCAkQCCQC51/Vezu6XQTANBgkqhkiG9w0BAQsFADBwMQswCQYDVQQGEwJV
        UzETMBEGA1UECBMKV2FzaGluZ3RvbjEQMA4GA1UEBxMHU2VhdHRsZTERMA8GA1UE
        ChMISDhYTUxTZWMxCzAJBgNVBAsTAkg4MRowGAYDVQQDExFodHRwczovL2xvY2Fs
@@ -25,26 +19,7 @@
        q8YGGmLjYJYLG/iH/3V5jTakW+CrxWwzQOyYAT3pnWkT9oO/7JoL7BPgtsCgcbSy
        voouaKe1wvNWe2bdLO/W5Lh4rtFMUC4r5dBhRhT7qkLw2ZTP7YhTE0jA6ITQy1Nf
        xeMf79IFVRcxhn+2JTdZhkPdUjaeQLZ/8aU9IkPL2Kj6wckqMKKepa7oH20XBOjN
-</X509Certificate></X509Data></KeyInfo></Signature><IDPSSODescriptor protocolSupportEnumeration="urn:oasis:names:tc:SAML:2.0:protocol"><KeyDescriptor use="signing"><KeyInfo xmlns="http://www.w3.org/2000/09/xmldsig#"><X509Data><X509Certificate>
-       MIIDXDCCAkQCCQC51/Vezu6XQTANBgkqhkiG9w0BAQsFADBwMQswCQYDVQQGEwJV
-       UzETMBEGA1UECBMKV2FzaGluZ3RvbjEQMA4GA1UEBxMHU2VhdHRsZTERMA8GA1UE
-       ChMISDhYTUxTZWMxCzAJBgNVBAsTAkg4MRowGAYDVQQDExFodHRwczovL2xvY2Fs
-       aG9zdDAeFw0xNDExMDUyMTA1MzhaFw0yNDExMDIyMTA1MzhaMHAxCzAJBgNVBAYT
-       AlVTMRMwEQYDVQQIEwpXYXNoaW5ndG9uMRAwDgYDVQQHEwdTZWF0dGxlMREwDwYD
-       VQQKEwhIOFhNTFNlYzELMAkGA1UECxMCSDgxGjAYBgNVBAMTEWh0dHBzOi8vbG9j
-       YWxob3N0MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAzH95S1WHsk6u
-       hdNK04iMEjdXSL2Dw0YipB25mx3DlMgtRjk/PMJ5ZFJkuU26bVzpWyRO9AvaYj48
-       u3tnWaGfrZV/CQ8rwkUbntChglxFlOtqDAtN+KGuKOSM9e6dAGqtqq0sTNyYwXtE
-       8Ho3ZtxlUTw1GNCT/SI5qtDr1ON172awWFYacN137EGDBkCgDMKXdqUFuDfB7cnR
-       kbvJUzvu+NQjkdYmCTArbH+akMEh2Ln+i9j6VmsS7aNgX5GYpN8ir+NjxN6QYc9K
-       wJRYBHSsJb5DZqrdOprAXk1J11fWrzBA1tudv2QOwkAj/Nl61SNlOmUo1RFEVWDi
-       q9xI9lT50QIDAQABMA0GCSqGSIb3DQEBCwUAA4IBAQA8/E+Nv30/AwtfKVh/Eym0
-       TtEcHcq9cetD5gVRXFK/MCoccKonpsmkR/cxwEwsgApb5ycCq0xthkhVnzhFq22J
-       2kPlWHBryAJSSqlnmSavJNzwRwu+sIas/ctwSD4hyqOzdb9MVe2rNOANXL3ICBDT
-       q8YGGmLjYJYLG/iH/3V5jTakW+CrxWwzQOyYAT3pnWkT9oO/7JoL7BPgtsCgcbSy
-       voouaKe1wvNWe2bdLO/W5Lh4rtFMUC4r5dBhRhT7qkLw2ZTP7YhTE0jA6ITQy1Nf
-       xeMf79IFVRcxhn+2JTdZhkPdUjaeQLZ/8aU9IkPL2Kj6wckqMKKepa7oH20XBOjN
-       </X509Certificate></X509Data></KeyInfo></KeyDescriptor><NameIDFormat>urn:oasis:names:tc:SAML:1.1:nameid-format:emailAddress</NameIDFormat><SingleSignOnService Binding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Redirect" Location=""/><saml:Attribute NameFormat="urn:oasis:names:tc:SAML:2.0:attrname-format:uri" Name="email-address" FriendlyName="emailAddress"/></IDPSSODescriptor>
+       </X509Certificate></X509Data></KeyInfo></KeyDescriptor><SingleLogoutService Binding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST" Location=""/><NameIDFormat>urn:oasis:names:tc:SAML:1.1:nameid-format:emailAddress</NameIDFormat><SingleSignOnService Binding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Redirect" Location=""/><saml:Attribute NameFormat="urn:oasis:names:tc:SAML:2.0:attrname-format:uri" Name="email-address" FriendlyName="emailAddress"/></IDPSSODescriptor>
          <AttributeAuthorityDescriptor protocolSupportEnumeration="urn:oasis:names:tc:SAML:2.0:protocol"><KeyDescriptor use="signing"><KeyInfo xmlns="http://www.w3.org/2000/09/xmldsig#"><X509Data><X509Certificate>
        MIIDXDCCAkQCCQC51/Vezu6XQTANBgkqhkiG9w0BAQsFADBwMQswCQYDVQQGEwJV
        UzETMBEGA1UECBMKV2FzaGluZ3RvbjEQMA4GA1UEBxMHU2VhdHRsZTERMA8GA1UE

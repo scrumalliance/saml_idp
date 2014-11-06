@@ -26,6 +26,8 @@ module SamlIdp
 
             xml.IDPSSODescriptor protocolSupportEnumeration: protocol_enumeration do
               build_key_descriptor xml
+              xml.SingleLogoutService Binding: "urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST",
+                Location: single_logout_service_post_location
               build_name_id_formats xml
               xml.SingleSignOnService Binding: "urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Redirect",
                 Location: single_service_post_location
@@ -150,6 +152,7 @@ module SamlIdp
       organization_name
       organization_url
       attribute_service_location
+      single_logout_service_post_location
       single_service_post_location
       technical_contact
     ].each do |delegatable|
