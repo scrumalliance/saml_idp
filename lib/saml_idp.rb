@@ -38,6 +38,7 @@ module SamlIdp
       prev_node = doc.xpath(path_to_prev_sibling_of_signature, namespaces)[0]
       prev_node.add_next_sibling(signature)
     end
+
     no_dtd = Nokogiri::XML('<dummy />')
     no_dtd.root.replace(doc.root)
     no_dtd
@@ -92,11 +93,19 @@ module Saml
         !!signature_node
       end
 
-      def valid_signature?(fingerprint)
+      def valid_signature?(fingerprint_or_cert)
         # Null signature is tautologically valid.
         #
         # TODO(awong): Should default to requiring a signature node.
         return true if not signed?
+
+        # TODO(awong): If this is a cert,there's no point in fingerprinting. Just compare
+        # the two directly and save the CPU.
+        if fingerprint_or_cert.include?('-----BEGIN CERTIFICATE-----')
+          fingerprint = SamlIdp::fingerprint_cert(fingerprint_or_cert)
+        else
+          fingerprint = fingerprint_or_cert
+        end
 
         signature = signature_node
         cert_element = signature.at_xpath("./ds:KeyInfo/ds:X509Data/ds:X509Certificate", ds: Namespaces::SIGNATURE)
