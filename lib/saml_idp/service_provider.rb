@@ -19,7 +19,7 @@ module SamlIdp
       attributes.present?
     end
 
-    def valid_signature?(doc, require_signature: false)
+    def valid_signature?(doc, require_signature=false)
       if require_signature || should_validate_signature?
         doc.signed? && doc.valid_signature?(fingerprint)
       else
