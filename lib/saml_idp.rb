@@ -6,8 +6,19 @@ module SamlIdp
   require 'saml_idp/controller'
   require 'saml_idp/default'
   require 'saml_idp/metadata_builder'
+  require 'saml_idp/xml_security'
   require 'saml_idp/version'
   require 'saml_idp/engine' if defined?(::Rails) && Rails::VERSION::MAJOR > 2
+
+  class <<self
+    attr_accessor :logger
+  end
+
+  class Railties < ::Rails::Railtie
+    initializer 'Rails logger' do
+      SamlIdp.logger = Rails.logger
+    end
+  end
 
   def self.config
     @config ||= SamlIdp::Configurator.new
@@ -21,15 +32,45 @@ module SamlIdp
     @metadata ||= MetadataBuilder.new(config)
   end
 
-  def self.add_id_doctype(doc, tag_to_sign)
-    dtd = "<!DOCTYPE #{tag_to_sign} [ <!ELEMENT #{tag_to_sign} (#PCDATA)> <!ATTLIST #{tag_to_sign} ID ID #IMPLIED> ]>"
+  def self.add_id_doctype(doc, element_to_sign)
+    # DTDs do not understand XML namespaces. In XML, element.name will strip
+    # the namespace prefix. Examples:
+    #
+    # # element.name == a, element.namespace = nil
+    # <a />
+    #
+    # # element.name == a, element.namespace.prefix = nil
+    # <a xmlns="http://defaultns.com" />
+    #
+    # # element.name == a, element.namespace.prefix = ns
+    # <ns:a xmlns:ns="http://example.com" />
+    #
+    # # element.name == a, element.namespace.prefix = ns
+    # <ns:a xmlns:ns="http://example.com" />
+    #
+    # # Malformed if ns is not declare earlier in the document context.
+    # # However, element.name == ns:a.
+    # <ns:a />
+    #
+    # # Malformed if ns is not declare earlier in the document context.
+    # # Nokogiri gets confused and element.name == ns:a, but
+    # # element.namespace = nil.
+    # <ns:a xmlns="http://defaultns.com"/>
+    #
+    # To construct the correct DTD element name, the code must be aware of the
+    # namespace field.
+    if element_to_sign.namespace.present? && element_to_sign.namespace.prefix.present?
+      dtd_element_name = "#{element_to_sign.namespace.prefix}:#{element_to_sign.name}"
+    else
+      dtd_element_name = element_to_sign.name
+    end
+    dtd = "<!DOCTYPE #{dtd_element_name} [ <!ELEMENT #{dtd_element_name} (#PCDATA)> <!ATTLIST #{dtd_element_name} ID ID #IMPLIED> ]>"
     Nokogiri::XML(dtd + doc.root.to_xml)
   end
 
   def self.sign_root_element(doc, signature_opts, path_to_prev_sibling_of_signature = nil, namespaces = nil)
     # xmldsig expects the tag being signed has an id field that it can reference.
-    tag_to_sign = doc.first_element_child.name
-    doc = add_id_doctype(doc, tag_to_sign)
+    doc = add_id_doctype(doc, doc.first_element_child)
     cloned_signature_opts = signature_opts.clone
     cloned_signature_opts[:uri] = "##{doc.first_element_child[:ID]}"
     doc.sign! cloned_signature_opts
@@ -127,12 +168,21 @@ module Saml
 
         cert_fingerprint = fingerprint_method.hexdigest(cert.to_der)
         if cert_fingerprint != normalized_fingerprint
+          SamlIdp.logger.info("Certificate did not match expected fingerprint: #{fingerprint}")
           return false
         end
 
-        id_element = at_xpath('//*[@ID]')
-        doc_with_dtd = SamlIdp::add_id_doctype(self, id_element.name)
-        doc_with_dtd.verify_with(cert: cert.to_pem)
+        signed_doc = SamlIdp::XMLSecurity::SignedDocument.new(to_xml)
+        begin
+          signed_doc.validate_doc(base64_cert, false)
+        rescue SamlIdp::XMLSecurity::SignedDocument::ValidationError => e
+          SamlIdp.logger.info("Signature validation error: #{e.message}")
+          SamlIdp.logger.info("Signature validation error: #{e.backtrace[1..10].join("\n")}")
+          return false
+        end
+#        id_element = at_xpath('//*[@ID]')
+#        doc_with_dtd = SamlIdp::add_id_doctype(self, id_element)
+#        doc_with_dtd.verify_with(cert: cert.to_pem)
       end
 
       def signature_namespace

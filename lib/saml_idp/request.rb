@@ -46,10 +46,27 @@ module SamlIdp
       # TODO(awong): This should validate against the schema. Also assert the
       # existance of only 1 AuthnRequest or LogoutRequest. This is probably
       # handled by schema.
-      service_provider? &&
-        (authn_request.present? ^ logout_request.present?) &&
-        valid_signature? &&
-        response_url.present?
+      unless service_provider?
+        SamlIdp.logger.info "Unable to find service provider for issuer #{issuer}"
+        return false
+      end
+
+      unless (authn_request.present? ^ logout_request.present?)
+        SamlIdp.logger.info "One and only one of authnrequest and logout request is required. authnrequest: #{authn_request.present?} logout_request: #{logout_request.present?} "
+        return false
+      end
+
+      unless valid_signature?
+        SamlIdp.logger.info "Signature is invalid in #{raw_xml}"
+        return false
+      end
+
+      unless response_url.present?
+        SamlIdp.logger.info "Unable to find response url for #{issuer}"
+        return false
+      end
+
+      return true
     end
 
     def valid_signature?
