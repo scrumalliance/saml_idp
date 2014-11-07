@@ -6,8 +6,19 @@ module SamlIdp
   require 'saml_idp/controller'
   require 'saml_idp/default'
   require 'saml_idp/metadata_builder'
+  require 'saml_idp/xml_security'
   require 'saml_idp/version'
   require 'saml_idp/engine' if defined?(::Rails) && Rails::VERSION::MAJOR > 2
+
+  class <<self
+    attr_accessor :logger
+  end
+
+  class Railties < ::Rails::Railtie
+    initializer 'Rails logger' do
+      SamlIdp.logger = Rails.logger
+    end
+  end
 
   def self.config
     @config ||= SamlIdp::Configurator.new
@@ -157,12 +168,21 @@ module Saml
 
         cert_fingerprint = fingerprint_method.hexdigest(cert.to_der)
         if cert_fingerprint != normalized_fingerprint
+          SamlIdp.logger.info("Certificate did not match expected fingerprint: #{fingerprint}")
           return false
         end
 
-        id_element = at_xpath('//*[@ID]')
-        doc_with_dtd = SamlIdp::add_id_doctype(self, id_element)
-        doc_with_dtd.verify_with(cert: cert.to_pem)
+        signed_doc = SamlIdp::XMLSecurity::SignedDocument.new(to_xml)
+        begin
+          signed_doc.validate_doc(base64_cert, false)
+        rescue SamlIdp::XMLSecurity::SignedDocument::ValidationError => e
+          SamlIdp.logger.info("Signature validation error: #{e.message}")
+          SamlIdp.logger.info("Signature validation error: #{e.backtrace[1..10].join("\n")}")
+          return false
+        end
+#        id_element = at_xpath('//*[@ID]')
+#        doc_with_dtd = SamlIdp::add_id_doctype(self, id_element)
+#        doc_with_dtd.verify_with(cert: cert.to_pem)
       end
 
       def signature_namespace
