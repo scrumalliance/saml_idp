@@ -78,7 +78,12 @@ module SamlIdp
     def decode_request(raw_saml_request)
       case request.request_method
       when "POST"
-        self.saml_request = Request.new raw_saml_request
+        # Request is Base64 encoded. See #3.5.4 of
+        # http://docs.oasis-open.org/security/saml/v2.0/saml-bindings-2.0-os.pdf
+        #
+        # Note that while this specific stanza does not list it, the rest of the doc
+        # cites RFC 2045 as the base64 standard.
+        self.saml_request = Request.new(Base64.decode64(raw_saml_request))
       when "GET"
         # SAML Requests via GET are using the redirect binding which defaltes and
         # base64 encodes a SAML Request.
