@@ -116,15 +116,14 @@ describe SamlIdp::Controller do
 
   context "Single Logout" do
     before(:each) do
-      # TODO(awong): Test POST.
-      params[:SAMLRequest] = SamlIdp::LogoutRequestBuilder.new(
+      params[:SAMLRequest] = Base64.encode64(SamlIdp::LogoutRequestBuilder.new(
         '_response_id',
         'localhost:3000',
         'http://localhost:1337/saml/logout',
         'himom',
         'some_qualifier',
         'abc123index',
-        signature_opts).build.to_xml
+        signature_opts).build.to_xml)
       @request = MockRequest.new('POST')
       validate_saml_request
     end
