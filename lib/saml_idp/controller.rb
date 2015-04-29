@@ -28,10 +28,7 @@ module SamlIdp
     protected
 
     def validate_saml_request(raw_saml_request = params[:SAMLRequest])
-      if raw_saml_request.nil?
-        render nothing: true, status: :forbidden
-        return
-      end
+      render(nothing: true, status: 400) && return if invalid_request_syntax?(raw_saml_request)
       decode_request(raw_saml_request)
 
       # TODO(awong): This block has an incorrect if conditional. It should be
@@ -75,23 +72,26 @@ module SamlIdp
       render nothing: true, status: :forbidden unless valid_saml_request?
     end
 
+    # verify that the request includes a saml_request and uses a supported binding
+    def invalid_request_syntax?(raw_saml_request)
+      raw_saml_request.nil? || !%w{GET POST}.include?(request.request_method)
+    end
+
     def decode_request(raw_saml_request)
       case request.request_method
-      when "POST"
+      when 'POST'
         # Request is Base64 encoded. See #3.5.4 of
         # http://docs.oasis-open.org/security/saml/v2.0/saml-bindings-2.0-os.pdf
         #
         # Note that while this specific stanza does not list it, the rest of the doc
         # cites RFC 2045 as the base64 standard.
         self.saml_request = Request.new(Base64.decode64(raw_saml_request))
-      when "GET"
+      when 'GET'
         # SAML Requests via GET are using the redirect binding which defaltes and
         # base64 encodes a SAML Request.
         #
         # See #3.4 of http://docs.oasis-open.org/security/saml/v2.0/saml-bindings-2.0-os.pdf
         self.saml_request = Request.from_deflated_request(raw_saml_request)
-      else
-        raise "Unknown binding #{request.request_method}"
       end
     end
 
