@@ -38,7 +38,7 @@ module SamlIdp
 
     def response_url
       return service_provider.acs_url if xpath("//samlp:AuthnRequest", samlp: samlp).first.present?
-      return service_provider.sso_url if xpath("//samlp:LogoutRequest", samlp: samlp).first.present?
+      return service_provider.assertion_consumer_logout_service_url if xpath("//samlp:LogoutRequest", samlp: samlp).first.present?
       return nil
     end
 

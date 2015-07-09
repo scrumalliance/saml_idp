@@ -10,7 +10,7 @@ module SamlIdp
     attribute :fingerprint
     attribute :identifier
     attribute :metadata_url
-    attribute :sso_url
+    attribute :assertion_consumer_logout_service_url
     attribute :validate_signature
 
     delegate :config, to: :SamlIdp
