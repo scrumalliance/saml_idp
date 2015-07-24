@@ -127,7 +127,7 @@ EOS
       cert: SERVICE_PROVIDER_CERT,
       fingerprint: SP_FINGERPRINT,
       acs_url: 'http://localhost:3000/saml/consume',
-      sso_url: 'http://localhost:3000/saml/sso_return',
+      assertion_consumer_logout_service_url: 'http://localhost:3000/saml/sso_return',
       block_encryption: 'aes256-cbc',
       key_transport: 'rsa-oaep-mgf1p',
     }
