@@ -4,6 +4,7 @@ require 'time'
 require 'uuid'
 require 'saml_idp/request'
 require 'saml_idp/logout_response_builder'
+require 'saml_idp/logout_request_builder'
 
 module SamlIdp
   module Controller
