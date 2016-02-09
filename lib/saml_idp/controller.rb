@@ -4,6 +4,7 @@ require 'time'
 require 'uuid'
 require 'saml_idp/request'
 require 'saml_idp/logout_response_builder'
+require 'saml_idp/logout_request_builder'
 
 module SamlIdp
   module Controller
@@ -143,7 +144,7 @@ module SamlIdp
 
       if saml_request.authn_request.present?
         audience_uri = opts[:audience_uri] || saml_request.issuer || saml_response_url[/^(.*?\/\/.*?\/)/, 1]
-        reference_id = get_saml_reference_id
+        reference_id = opts[:reference_id] || get_saml_reference_id
         authn_context_classref = opts[:authn_context_classref] || Saml::XML::Namespaces::AuthnContext::ClassRef::PASSWORD
 
         encryption_opts = {}

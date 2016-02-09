@@ -21,9 +21,8 @@ module SamlIdp
                           IssueInstant: now_iso,
                           Destination: @saml_slo_url) do
           xml.Issuer @issuer_uri, xmlns: Saml::XML::Namespaces::ASSERTION
-          xml.NameID @name_id, xmlns: Saml::XML::Namespaces::ASSERTION,
-            Format: Saml::XML::Namespaces::Formats::NameId::PERSISTENT,
-            NameQualifier: @name_qualifier
+          xml.NameID @name_id,
+            Format: Saml::XML::Namespaces::Formats::NameId::PERSISTENT
           xml.SessionIndex @session_index
         end
       end
