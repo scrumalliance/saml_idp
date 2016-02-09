@@ -46,7 +46,7 @@ module SamlIdp
           '_response_id',
           'localhost:3000',
           'http://localhost:1337/saml/logout',
-          'himom',
+          '_some_name_id',
           'some_qualifier',
           'abc123index',
           signature_opts).build.to_xml) }
@@ -84,6 +84,18 @@ module SamlIdp
         subject.document.xpath('/*/ds:Signature', 
                                ds: Saml::XML::Namespaces::SIGNATURE)[0].remove
         subject.valid_signature?.should be_falsey
+      end
+
+      it "has a name id" do
+        subject.name_id_node.content.should eq("_some_name_id")
+      end
+
+      it "has a well-formed name id" do
+        expect(subject.name_id_node.attributes.include?('NameQualifier')).to eq(false)
+        expect(subject.name_id_node.to_xml).to_not include('Namespace')
+
+        expect(subject.name_id_node.attributes['Format'].value).
+          to eq('urn:oasis:names:tc:SAML:2.0:nameid-format:persistent')
       end
     end
 

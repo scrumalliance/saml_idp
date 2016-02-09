@@ -42,6 +42,10 @@ module SamlIdp
       return nil
     end
 
+    def name_id_node
+      @name_id_nodes ||= xpath('/saml:LogoutRequest/saml:NameID', saml: Saml::XML::Namespaces::PROTOCOL).first
+    end
+
     def valid?
       # TODO(awong): This should validate against the schema. Also assert the
       # existance of only 1 AuthnRequest or LogoutRequest. This is probably
