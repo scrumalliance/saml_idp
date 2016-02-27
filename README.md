@@ -6,6 +6,10 @@ your application to act as an IdP (Identity Provider) using the
 [SAML v2.0](http://en.wikipedia.org/wiki/Security_Assertion_Markup_Language)
 protocol. It provides a means for managing authentication requests and confirmation responses for SPs (Service Providers).
 
+#### Dependencies:
+
+Must have `libxml2` installed. On OSX, install with Homebrew via `brew install libxml2` and then link with `brew link libxml2 --force`. 
+
 <hr>
 
 :information_source: We have forked this gem in order to develop an ICAM solution leveraging Ruby SAML. We are working towards distilling our enhancements and offering more suport to the community-backed gems. To get involved with the community development of Ruby SAML or SAML IdP please visit their GitHub repositories.
