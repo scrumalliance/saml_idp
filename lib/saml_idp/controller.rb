@@ -101,7 +101,7 @@ module SamlIdp
     end
     
     def encode_response(principal, opts = {})
-      Base64.encode64(response_doc(principal, opts).to_xml)
+      Base64.strict_encode64(response_doc(principal, opts).to_xml)
     end
 
     def relay_state
