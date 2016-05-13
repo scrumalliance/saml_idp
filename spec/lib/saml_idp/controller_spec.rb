@@ -52,6 +52,8 @@ describe SamlIdp::Controller do
 
     it "should create an Encrypted, signed SAML Response" do
       saml_response = encode_response(principal)
+      expect(saml_response).to_not match(/\s/)
+
       response = OneLogin::RubySaml::Response.new(
         saml_response,
         { private_key: SamlIdp::Default::SERVICE_PROVIDER_KEY })
