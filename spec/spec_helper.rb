@@ -27,6 +27,10 @@ RSpec.configure do |config|
   config.mock_with :rspec
   config.order = "random"
 
+  config.expect_with :rspec do |c|
+    c.syntax = [:should, :expect]
+  end
+
   config.include RSpec::XSD
   config.include SamlRequestMacros
   config.include SecurityHelpers
