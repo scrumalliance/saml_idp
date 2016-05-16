@@ -12,6 +12,7 @@ module SamlIdp
     end
 
     it "has expected fields" do
+      SamlIdp.config.base_saml_location = nil
       # Rip the assertion into a separate doc for more stabe comparisons.
       generated_doc = subject.build
       expected_doc = Nokogiri::XML(fixture("metadata.xml"))

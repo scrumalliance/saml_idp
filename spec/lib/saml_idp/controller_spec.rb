@@ -2,8 +2,6 @@
 require 'spec_helper'
 require 'saml_idp/logout_request_builder'
 
-SamlIdp.config.base_saml_location = 'http://example.com'
-
 class MySamlController < ApplicationController
   include SamlIdp::Controller
 

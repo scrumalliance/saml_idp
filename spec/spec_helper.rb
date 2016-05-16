@@ -38,6 +38,8 @@ RSpec.configure do |config|
 
   config.before do
     SamlIdp.configure do |c|
+      c.base_saml_location = 'http://example.com'
+
       c.attributes = {
         emailAddress: {
           name: "email-address",
