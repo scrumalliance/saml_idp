@@ -32,6 +32,8 @@ Gem::Specification.new do |s|
   s.add_development_dependency "rake"
   s.add_development_dependency "simplecov"
   s.add_development_dependency "rspec", "~> 3"
+  s.add_development_dependency "rspec-rails", "~> 3"
+  s.add_development_dependency 'test-unit', '~> 3.0'
 #  s.add_development_dependency('nokogiri-xmlsec-me-harder', "~> 0.9")
 #  s.add_development_dependency "ruby-saml", "~> 0.8"
   s.add_development_dependency("rails", "~> 3.2")

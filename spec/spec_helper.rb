@@ -11,6 +11,7 @@ STDERR.puts("Running Specs under Ruby Version #{RUBY_VERSION}")
 require "rails_app/config/environment"
 
 require 'rspec'
+require 'rspec/rails'
 require 'capybara/rspec'
 require 'capybara/rails'
 
@@ -27,12 +28,18 @@ RSpec.configure do |config|
   config.mock_with :rspec
   config.order = "random"
 
+  config.expect_with :rspec do |c|
+    c.syntax = [:should, :expect]
+  end
+
   config.include RSpec::XSD
   config.include SamlRequestMacros
   config.include SecurityHelpers
 
   config.before do
     SamlIdp.configure do |c|
+      c.base_saml_location = 'http://example.com'
+
       c.attributes = {
         emailAddress: {
           name: "email-address",
