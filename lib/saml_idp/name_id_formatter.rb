@@ -38,7 +38,9 @@ module SamlIdp
     end
 
     def symbolized_name_id_format
-      @symbolized_name_id_format ||= sp_name_id_format.split(':').last.underscore.to_sym
+      puts "symbolized_name_id_format received: " + sp_name_id_format.inspect
+      #temporary fix, did deeper into sp_name_id_format in assertion_builder
+      @symbolized_name_id_format ||= sp_name_id_format.split(':').last.underscore.to_sym rescue :email_address
     end
 
     def one_one_nameid_format?(format)
